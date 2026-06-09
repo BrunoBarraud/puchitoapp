@@ -16,9 +16,9 @@ export function AppShell({
   title: string;
 }) {
   return (
-    <div className="mx-auto flex min-h-screen max-w-[1600px] gap-4 p-2 sm:p-4 lg:gap-6 lg:p-6">
+    <div className="mx-auto flex min-h-screen max-w-[1600px] gap-4 px-2 pb-2 pt-[calc(0.5rem+env(safe-area-inset-top))] sm:p-4 lg:gap-6 lg:p-6">
       <Sidebar pathname={pathname} />
-      <main className="min-w-0 flex-1 space-y-4 pb-24 sm:space-y-6 lg:pb-6">
+      <main className="min-w-0 flex-1 space-y-4 pb-32 sm:space-y-6 sm:pb-36 lg:pb-6">
         <Topbar />
         <section className="relative overflow-hidden rounded-[1.5rem] border border-[#eadfcb] bg-[#fffaf2]/95 p-4 shadow-[0_18px_40px_-28px_rgba(58,38,18,0.35)] backdrop-blur sm:rounded-[2rem] sm:p-5">
           <div className="absolute inset-x-4 top-0 h-1 rounded-full bg-gradient-to-r from-brand-500 via-brand-700 to-brand-500 sm:inset-x-5" />

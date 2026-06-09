@@ -6,6 +6,14 @@ export function formatCurrency(value: number) {
   }).format(value);
 }
 
+export function formatCurrencyCompact(value: number) {
+  return new Intl.NumberFormat("es-AR", {
+    style: "currency",
+    currency: "ARS",
+    maximumFractionDigits: 0
+  }).format(value);
+}
+
 export function formatDate(value: Date | string) {
   return new Intl.DateTimeFormat("es-AR", {
     day: "2-digit",
@@ -15,7 +23,7 @@ export function formatDate(value: Date | string) {
 }
 
 export function getMonthLabel(month: number, year: number) {
-  return new Intl.DateTimeFormat("en-US", {
+  return new Intl.DateTimeFormat("es-AR", {
     month: "long",
     year: "numeric"
   }).format(new Date(year, month - 1, 1));

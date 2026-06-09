@@ -1,5 +1,5 @@
-const CACHE_NAME = "puchito-app-v1";
-const STATIC_ASSETS = ["/logo-puchito-app.png", "/manifest.webmanifest"];
+const CACHE_NAME = "puchito-app-v2";
+const STATIC_ASSETS = ["/logo-puchito-app.png", "/favicon.png", "/app-icon.png", "/manifest.webmanifest"];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(

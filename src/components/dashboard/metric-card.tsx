@@ -4,9 +4,9 @@ export function MetricCard({ label, value, accent }: { label: string; value: str
   return (
     <Card className="min-w-0 overflow-hidden p-0">
       <div className="h-1.5" style={{ backgroundColor: accent }} />
-      <div className="min-w-0 p-4 sm:p-5">
-        <p className="truncate text-[10px] font-semibold uppercase tracking-[0.12em] text-stone-500 sm:text-[11px] sm:tracking-[0.18em]">{label}</p>
-        <p className="mt-3 min-w-0 break-words text-[clamp(1.25rem,6vw,1.875rem)] font-black leading-tight tracking-tight text-stone-900">{value}</p>
+      <div className="min-w-0 p-3 sm:p-5">
+        <p className="truncate text-[9px] font-semibold uppercase tracking-[0.1em] text-stone-500 sm:text-[11px] sm:tracking-[0.18em]">{label}</p>
+        <p className="mt-3 min-w-0 whitespace-nowrap text-[clamp(1.1rem,5.1vw,1.875rem)] font-black leading-tight tracking-tight text-stone-900">{value}</p>
       </div>
     </Card>
   );

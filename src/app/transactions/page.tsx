@@ -67,12 +67,48 @@ export default async function TransactionsPage({
             <input name="year" type="number" min="2000" max="2100" defaultValue={year} className="min-w-0 rounded-2xl border px-4 py-2.5 text-sm" />
             <button className="rounded-2xl bg-stone-900 px-4 py-2.5 text-sm font-semibold text-white">Filtrar</button>
           </form>
-          <div className="mt-5 overflow-x-auto">
+          <div className="mt-5 space-y-3 md:hidden">
+            {transactions.map((transaction) => (
+              <div key={transaction.id} className="rounded-2xl border border-[#eadfcb] bg-white px-4 py-4 shadow-[0_12px_28px_-24px_rgba(58,38,18,0.35)]">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="truncate text-base font-bold text-stone-900">{transaction.title}</p>
+                    <p className="mt-1 text-sm text-stone-500">{transaction.category.name}</p>
+                    <p className="mt-1 text-xs text-stone-400">{formatDate(transaction.date)}</p>
+                    {transaction.installmentPlan ? (
+                      <span className="mt-2 inline-flex rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-800">
+                        {transaction.installmentPlan.installmentCount} cuotas
+                      </span>
+                    ) : null}
+                  </div>
+                  <p className={`shrink-0 whitespace-nowrap text-right text-base font-black ${transaction.type === "INCOME" ? "text-emerald-600" : "text-rose-600"}`}>
+                    {transaction.type === "INCOME" ? "+" : "-"}
+                    {formatCurrency(Number(transaction.amount))}
+                  </p>
+                </div>
+                <div className="mt-4 flex flex-wrap gap-2">
+                  <a
+                    href={`/transactions?editId=${transaction.id}&month=${month}&year=${year}`}
+                    className="rounded-xl border px-3 py-1.5 text-xs font-semibold"
+                  >
+                    Editar
+                  </a>
+                  <form action={deleteTransaction}>
+                    <input type="hidden" name="id" value={transaction.id} />
+                    <button className="rounded-xl bg-rose-100 px-3 py-1.5 text-xs font-semibold text-rose-700">Eliminar</button>
+                  </form>
+                </div>
+              </div>
+            ))}
+            {transactions.length === 0 ? <p className="pt-2 text-sm text-stone-500">No se encontraron movimientos.</p> : null}
+          </div>
+
+          <div className="mt-5 hidden overflow-x-auto md:block">
             <table className="min-w-[680px] text-left text-sm">
               <thead className="text-stone-500">
                 <tr>
-                  <th className="pb-3">Titulo</th>
-                  <th className="pb-3">Categoria</th>
+                  <th className="pb-3">Título</th>
+                  <th className="pb-3">Categoría</th>
                   <th className="pb-3">Fecha</th>
                   <th className="pb-3">Monto</th>
                   <th className="pb-3">Cuotas</th>

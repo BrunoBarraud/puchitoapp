@@ -14,19 +14,19 @@ export default function manifest(): MetadataRoute.Manifest {
     categories: ["finance", "productivity"],
     icons: [
       {
-        src: "/logo-puchito-app.png",
+        src: "/app-icon.png",
         sizes: "192x192",
         type: "image/png",
         purpose: "any"
       },
       {
-        src: "/logo-puchito-app.png",
+        src: "/app-icon.png",
         sizes: "512x512",
         type: "image/png",
         purpose: "any"
       },
       {
-        src: "/logo-puchito-app.png",
+        src: "/app-icon.png",
         sizes: "512x512",
         type: "image/png",
         purpose: "maskable"

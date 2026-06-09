@@ -1,7 +1,7 @@
 import { AppShell } from "@/components/layout/app-shell";
 import { MetricCard } from "@/components/dashboard/metric-card";
 import { Card } from "@/components/ui/card";
-import { formatCurrency, formatDate, getMonthLabel } from "@/lib/formatters";
+import { formatCurrency, formatCurrencyCompact, formatDate, getMonthLabel } from "@/lib/formatters";
 import { parseMonthYear } from "@/lib/utils";
 import { requireUser } from "@/lib/auth";
 import { getDashboardData } from "@/server/queries/dashboard";
@@ -24,9 +24,9 @@ export default async function DashboardPage({
   return (
     <AppShell pathname="/dashboard" email={user.email} title="Resumen">
       <section className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4">
-        <MetricCard label="Balance" value={formatCurrency(data.balance)} accent="#7d5928" />
-        <MetricCard label="Ingresos" value={formatCurrency(data.income)} accent="#16a34a" />
-        <MetricCard label="Gastos" value={formatCurrency(data.expense)} accent="#dc2626" />
+        <MetricCard label="Balance" value={formatCurrencyCompact(data.balance)} accent="#7d5928" />
+        <MetricCard label="Ingresos" value={formatCurrencyCompact(data.income)} accent="#16a34a" />
+        <MetricCard label="Gastos" value={formatCurrencyCompact(data.expense)} accent="#dc2626" />
         <MetricCard label="Movimientos" value={String(data.totalTransactions)} accent="#0284c7" />
       </section>
 
@@ -71,7 +71,7 @@ export default async function DashboardPage({
                 <div key={transaction.id} className="rounded-[1.7rem] border border-[#eee3cf] bg-white px-4 py-4 shadow-[0_12px_28px_-24px_rgba(58,38,18,0.4)]">
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
-                      <p className="text-base font-bold text-stone-900">{transaction.title}</p>
+                      <p className="truncate text-base font-bold text-stone-900">{transaction.title}</p>
                       <p className="mt-1 text-sm text-stone-500">
                         {transaction.category.name} - {formatDate(transaction.date)}
                       </p>
@@ -81,7 +81,7 @@ export default async function DashboardPage({
                         </span>
                       ) : null}
                     </div>
-                    <p className={transaction.type === "INCOME" ? "text-right text-lg font-black text-emerald-600" : "text-right text-lg font-black text-rose-600"}>
+                    <p className={transaction.type === "INCOME" ? "shrink-0 whitespace-nowrap text-right text-base font-black text-emerald-600 sm:text-lg" : "shrink-0 whitespace-nowrap text-right text-base font-black text-rose-600 sm:text-lg"}>
                       {transaction.type === "INCOME" ? "+" : "-"}
                       {formatCurrency(Number(transaction.amount))}
                     </p>
