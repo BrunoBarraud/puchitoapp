@@ -1,0 +1,24 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+body {
+  @apply min-h-screen bg-[#f5efe2] text-stone-900;
+  background-image:
+    radial-gradient(circle at top left, rgba(180, 140, 73, 0.28), transparent 30%),
+    linear-gradient(135deg, rgba(255, 248, 238, 0.92), rgba(241, 232, 213, 0.95)),
+    radial-gradient(circle at 1px 1px, rgba(86, 58, 30, 0.08) 1px, transparent 0);
+  background-size: auto, auto, 22px 22px;
+}
+
+* {
+  @apply border-stone-200;
+}
+
+a {
+  @apply text-inherit no-underline;
+}
