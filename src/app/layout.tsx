@@ -1,5 +1,6 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Fraunces, Plus_Jakarta_Sans } from "next/font/google";
+import { PwaRegister } from "@/components/pwa/pwa-register";
 import "./globals.css";
 
 const plusJakartaSans = Plus_Jakarta_Sans({
@@ -14,13 +15,31 @@ const fraunces = Fraunces({
 
 export const metadata: Metadata = {
   title: "Puchito App",
-  description: "App para controlar esos gastos chicos que te funden."
+  description: "App para controlar esos gastos chicos que te funden.",
+  applicationName: "Puchito App",
+  manifest: "/manifest.webmanifest",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Puchito App"
+  },
+  icons: {
+    icon: "/logo-puchito-app.png",
+    apple: "/logo-puchito-app.png"
+  }
+};
+
+export const viewport: Viewport = {
+  themeColor: "#2f2118"
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en">
-      <body className={`${plusJakartaSans.variable} ${fraunces.variable} font-sans`}>{children}</body>
+    <html lang="es">
+      <body className={`${plusJakartaSans.variable} ${fraunces.variable} font-sans`}>
+        {children}
+        <PwaRegister />
+      </body>
     </html>
   );
 }
