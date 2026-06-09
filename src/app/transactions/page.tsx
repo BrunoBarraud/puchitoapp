@@ -45,7 +45,7 @@ export default async function TransactionsPage({
 
   return (
     <AppShell pathname="/transactions" email={user.email} title="Movimientos">
-      <div className="grid gap-6 xl:grid-cols-[0.9fr_1.1fr]">
+      <div className="grid gap-6 xl:grid-cols-[0.82fr_1.28fr]">
         <TransactionForm categories={categories} transaction={transactionToEdit} />
         <Card>
           <div className="mb-5">
@@ -53,12 +53,12 @@ export default async function TransactionsPage({
             <h2 className="mt-1 text-2xl font-black tracking-tight text-stone-900">Consulta de movimientos</h2>
             <p className="mt-1 text-sm text-stone-500">Filtrá los ingresos y gastos registrados para un mes específico.</p>
           </div>
-          <form className="grid gap-3 md:grid-cols-2 xl:grid-cols-[minmax(180px,1.4fr)_minmax(130px,0.8fr)_minmax(160px,1fr)_86px_112px_110px]">
-            <label className="grid gap-1">
+          <form className="grid gap-3 md:grid-cols-2 xl:grid-cols-[minmax(180px,1fr)_130px_minmax(150px,0.9fr)_80px_96px]">
+            <label className="grid min-w-0 gap-1">
               <span className="text-xs font-semibold text-stone-500">Buscar</span>
               <input name="query" placeholder="Buscar por título" defaultValue={params.query ?? ""} className="min-w-0 rounded-2xl border px-4 py-2.5 text-sm" />
             </label>
-            <label className="grid gap-1">
+            <label className="grid min-w-0 gap-1">
               <span className="text-xs font-semibold text-stone-500">Tipo</span>
               <select name="type" defaultValue={params.type ?? ""} className="min-w-0 rounded-2xl border px-4 py-2.5 text-sm">
                 <option value="">Todos</option>
@@ -66,7 +66,7 @@ export default async function TransactionsPage({
                 <option value="EXPENSE">Gasto</option>
               </select>
             </label>
-            <label className="grid gap-1">
+            <label className="grid min-w-0 gap-1">
               <span className="text-xs font-semibold text-stone-500">Categoría</span>
               <select name="categoryId" defaultValue={params.categoryId ?? ""} className="min-w-0 rounded-2xl border px-4 py-2.5 text-sm">
                 <option value="">Todas</option>
@@ -77,15 +77,15 @@ export default async function TransactionsPage({
                 ))}
               </select>
             </label>
-            <label className="grid gap-1">
+            <label className="grid min-w-0 gap-1">
               <span className="text-xs font-semibold text-stone-500">Mes</span>
               <input name="month" type="number" min="1" max="12" defaultValue={month} className="min-w-0 rounded-2xl border px-4 py-2.5 text-sm" />
             </label>
-            <label className="grid gap-1">
+            <label className="grid min-w-0 gap-1">
               <span className="text-xs font-semibold text-stone-500">Año</span>
               <input name="year" type="number" min="2000" max="2100" defaultValue={year} className="min-w-0 rounded-2xl border px-4 py-2.5 text-sm" />
             </label>
-            <div className="flex items-end">
+            <div className="flex items-end md:col-span-2 xl:col-span-5">
               <button className="h-[42px] w-full rounded-2xl bg-stone-900 px-4 text-sm font-semibold text-white">Filtrar</button>
             </div>
           </form>
@@ -125,38 +125,42 @@ export default async function TransactionsPage({
             {transactions.length === 0 ? <p className="pt-2 text-sm text-stone-500">No se encontraron movimientos.</p> : null}
           </div>
 
-          <div className="mt-5 hidden overflow-x-auto md:block">
-            <table className="min-w-[680px] text-left text-sm">
+          <div className="mt-5 hidden md:block">
+            <table className="w-full table-fixed text-left text-sm">
               <thead className="text-stone-500">
                 <tr>
-                  <th className="pb-3">Título</th>
-                  <th className="pb-3">Categoría</th>
-                  <th className="pb-3">Fecha</th>
-                  <th className="pb-3">Monto</th>
-                  <th className="pb-3">Cuotas</th>
-                  <th className="pb-3">Acciones</th>
+                  <th className="w-[24%] pb-3 pr-3">Título</th>
+                  <th className="w-[17%] pb-3 pr-3">Categoría</th>
+                  <th className="w-[18%] pb-3 pr-3">Fecha</th>
+                  <th className="w-[17%] pb-3 pr-3">Monto</th>
+                  <th className="w-[10%] pb-3 pr-3">Cuotas</th>
+                  <th className="w-[14%] pb-3">Acciones</th>
                 </tr>
               </thead>
               <tbody>
                 {transactions.map((transaction) => (
                   <tr key={transaction.id} className="border-t">
-                    <td className="py-3 font-semibold">{transaction.title}</td>
-                    <td className="py-3">{transaction.category.name}</td>
-                    <td className="py-3">{formatDate(transaction.date)}</td>
-                    <td className={`py-3 font-bold ${transaction.type === "INCOME" ? "text-emerald-600" : "text-rose-600"}`}>
+                    <td className="py-3 pr-3 font-semibold">
+                      <span className="block truncate">{transaction.title}</span>
+                    </td>
+                    <td className="py-3 pr-3">
+                      <span className="block truncate">{transaction.category.name}</span>
+                    </td>
+                    <td className="py-3 pr-3">{formatDate(transaction.date)}</td>
+                    <td className={`whitespace-nowrap py-3 pr-3 font-bold ${transaction.type === "INCOME" ? "text-emerald-600" : "text-rose-600"}`}>
                       {formatCurrency(Number(transaction.amount))}
                     </td>
-                    <td className="py-3">
+                    <td className="py-3 pr-3">
                       {transaction.installmentPlan ? (
-                        <span className="rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-800">
-                          {transaction.installmentPlan.installmentCount} cuotas
+                        <span className="inline-flex rounded-full bg-amber-100 px-2 py-1 text-xs font-semibold text-amber-800">
+                          {transaction.installmentPlan.installmentCount}
                         </span>
                       ) : (
                         <span className="text-xs text-stone-400">-</span>
                       )}
                     </td>
                     <td className="py-3">
-                      <div className="flex flex-wrap gap-2">
+                      <div className="flex flex-col gap-2">
                         <a
                           href={`/transactions?editId=${transaction.id}&month=${month}&year=${year}`}
                           className="rounded-xl border px-3 py-1.5 text-xs font-semibold"
