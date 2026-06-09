@@ -9,6 +9,7 @@ import { getDashboardData } from "@/server/queries/dashboard";
 type DashboardData = Awaited<ReturnType<typeof getDashboardData>>;
 type LatestTransaction = DashboardData["latestTransactions"][number];
 type UpcomingInstallment = DashboardData["upcomingInstallments"][number];
+type ExpenseByCategoryItem = DashboardData["expenseByCategory"][number];
 
 export default async function DashboardPage({
   searchParams
@@ -105,7 +106,7 @@ export default async function DashboardPage({
                   No se usaron categorias de gasto este mes.
                 </div>
               ) : (
-                data.expenseByCategory.map((item) => (
+                data.expenseByCategory.map((item: ExpenseByCategoryItem) => (
                   <div key={item.categoryId} className="rounded-[1.5rem] bg-white px-4 py-4 shadow-[0_12px_28px_-24px_rgba(58,38,18,0.35)]">
                     <div className="mb-3 flex items-center justify-between gap-3 text-sm">
                       <span className="font-semibold text-stone-900">{item.name}</span>
