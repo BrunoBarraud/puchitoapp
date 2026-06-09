@@ -1,8 +1,9 @@
 import { Card } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 
-export function MetricCard({ label, value, accent }: { label: string; value: string; accent: string }) {
+export function MetricCard({ label, value, accent, className }: { label: string; value: string; accent: string; className?: string }) {
   return (
-    <Card className="min-w-0 overflow-hidden p-0">
+    <Card className={cn("min-w-0 overflow-hidden p-0", className)}>
       <div className="h-1.5" style={{ backgroundColor: accent }} />
       <div className="min-w-0 p-3 sm:p-5">
         <p className="truncate text-[9px] font-semibold uppercase tracking-[0.1em] text-stone-500 sm:text-[11px] sm:tracking-[0.18em]">{label}</p>

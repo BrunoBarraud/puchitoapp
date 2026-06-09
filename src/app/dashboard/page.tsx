@@ -23,8 +23,9 @@ export default async function DashboardPage({
 
   return (
     <AppShell pathname="/dashboard" email={user.email} title="Resumen">
-      <section className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4">
-        <MetricCard label="Balance" value={formatCurrencyCompact(data.balance)} accent="#7d5928" />
+      <section className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-5">
+        <MetricCard className="col-span-2 xl:col-span-1" label="Total disponible" value={formatCurrencyCompact(data.totalBalance)} accent="#7d5928" />
+        <MetricCard label="Balance del mes" value={formatCurrencyCompact(data.balance)} accent="#a16207" />
         <MetricCard label="Ingresos" value={formatCurrencyCompact(data.income)} accent="#16a34a" />
         <MetricCard label="Gastos" value={formatCurrencyCompact(data.expense)} accent="#dc2626" />
         <MetricCard label="Movimientos" value={String(data.totalTransactions)} accent="#0284c7" />
@@ -75,9 +76,9 @@ export default async function DashboardPage({
                       <p className="mt-1 text-sm text-stone-500">
                         {transaction.category.name} - {formatDate(transaction.date)}
                       </p>
-                      {transaction.installmentPlan ? (
+                      {transaction.installmentLabel ? (
                         <span className="mt-2 inline-flex rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-800">
-                          {transaction.installmentPlan.installmentCount} cuotas
+                          {transaction.installmentLabel}
                         </span>
                       ) : null}
                     </div>

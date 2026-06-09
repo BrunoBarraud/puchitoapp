@@ -43,7 +43,7 @@ export function TransactionForm({
         <input type="hidden" name="id" defaultValue={transaction?.id} />
         <input type="hidden" name="isInstallment" value={isInstallment ? "true" : "false"} />
         <div className="grid gap-4 md:grid-cols-2">
-          <Field label="Titulo">
+          <Field label="Título">
             <Input name="title" defaultValue={transaction?.title} placeholder="Supermercado, sueldo..." required />
           </Field>
           <Field label="Monto">
@@ -55,7 +55,7 @@ export function TransactionForm({
               <option value="INCOME">Ingreso</option>
             </Select>
           </Field>
-          <Field label="Categoria">
+          <Field label="Categoría">
             <Select name="categoryId" value={categoryId} onChange={(event) => setCategoryId(event.target.value)} required>
               {filteredCategories.map((category) => (
                 <option key={category.id} value={category.id}>
@@ -86,7 +86,7 @@ export function TransactionForm({
               <span>
                 <span className="block font-semibold text-stone-900">Es una compra en cuotas</span>
                 <span className="block text-sm text-stone-600">
-                  Registra una compra financiada y genera automaticamente cada cuota.
+                  Registrá una compra financiada y generá automáticamente cada cuota.
                 </span>
               </span>
             </label>

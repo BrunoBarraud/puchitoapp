@@ -10,6 +10,8 @@ function getMonthRange(month: number, year: number) {
 
 export async function getDashboardData(userId: string, month: number, year: number) {
   const { start, end } = getMonthRange(month, year);
+  const today = new Date();
+  today.setHours(23, 59, 59, 999);
   const filter = {
     userId,
     date: {
@@ -18,9 +20,18 @@ export async function getDashboardData(userId: string, month: number, year: numb
     }
   };
 
-  const [transactions, groupedCategories, installmentPayments] = await Promise.all([
+  const [transactions, groupedCategories, installmentPayments, allTransactionTotals, dueInstallmentPayments] = await Promise.all([
     prisma.transaction.findMany({
-      where: filter,
+      where: {
+        ...filter,
+        OR: [
+          { type: "INCOME" },
+          {
+            type: "EXPENSE",
+            installmentPlan: null
+          }
+        ]
+      },
       include: {
         category: true,
         installmentPlan: {
@@ -39,7 +50,8 @@ export async function getDashboardData(userId: string, month: number, year: numb
       by: ["categoryId"],
       where: {
         ...filter,
-        type: "EXPENSE"
+        type: "EXPENSE",
+        installmentPlan: null
       },
       _sum: {
         amount: true
@@ -56,12 +68,40 @@ export async function getDashboardData(userId: string, month: number, year: numb
       include: {
         plan: {
           include: {
+            category: true,
             transaction: true
           }
         }
       },
       orderBy: {
         dueDate: "asc"
+      }
+    }),
+    prisma.transaction.groupBy({
+      by: ["type"],
+      where: {
+        userId,
+        OR: [
+          { type: "INCOME" },
+          {
+            type: "EXPENSE",
+            installmentPlan: null
+          }
+        ]
+      },
+      _sum: {
+        amount: true
+      }
+    }),
+    prisma.installmentPayment.findMany({
+      where: {
+        userId,
+        dueDate: {
+          lte: today
+        }
+      },
+      select: {
+        amount: true
       }
     })
   ]);
@@ -72,6 +112,10 @@ export async function getDashboardData(userId: string, month: number, year: numb
   const expense = transactions
     .filter((transaction) => transaction.type === "EXPENSE")
     .reduce((total, transaction) => total + Number(transaction.amount), 0);
+  const totalIncome = Number(allTransactionTotals.find((item) => item.type === "INCOME")?._sum.amount ?? 0);
+  const totalExpense = Number(allTransactionTotals.find((item) => item.type === "EXPENSE")?._sum.amount ?? 0);
+  const installmentExpense = installmentPayments.reduce((total, payment) => total + Number(payment.amount), 0);
+  const dueInstallmentExpense = dueInstallmentPayments.reduce((total, payment) => total + Number(payment.amount), 0);
   const categories = await prisma.category.findMany({
     where: {
       id: {
@@ -90,14 +134,55 @@ export async function getDashboardData(userId: string, month: number, year: numb
       total: Number(item._sum.amount ?? 0)
     };
   });
+  const installmentExpenseByCategory = new Map<string, { categoryId: string; name: string; color: string; total: number }>();
+
+  for (const payment of installmentPayments) {
+    const current = installmentExpenseByCategory.get(payment.plan.categoryId) ?? {
+      categoryId: payment.plan.categoryId,
+      name: payment.plan.category.name,
+      color: payment.plan.category.color ?? "#78716c",
+      total: 0
+    };
+
+    current.total += Number(payment.amount);
+    installmentExpenseByCategory.set(payment.plan.categoryId, current);
+  }
+
+  for (const item of installmentExpenseByCategory.values()) {
+    const existing = expenseByCategory.find((category) => category.categoryId === item.categoryId);
+
+    if (existing) {
+      existing.total += item.total;
+    } else {
+      expenseByCategory.push(item);
+    }
+  }
+
+  const monthlyMovements = transactions.map((transaction) => ({
+    ...transaction,
+    installmentLabel: null as string | null
+  }));
+  const installmentMovements = installmentPayments.map((payment) => ({
+    id: payment.id,
+    title: `${payment.plan.transaction.title} - cuota ${payment.installmentNumber}/${payment.plan.installmentCount}`,
+    amount: payment.amount,
+    type: "EXPENSE" as const,
+    date: payment.dueDate,
+    category: payment.plan.category,
+    installmentLabel: `${payment.installmentNumber}/${payment.plan.installmentCount} cuotas`
+  }));
+  const latestTransactions = [...monthlyMovements, ...installmentMovements]
+    .sort((a, b) => b.date.getTime() - a.date.getTime())
+    .slice(0, 5);
 
   return {
-    balance: income - expense,
+    totalBalance: totalIncome - totalExpense - dueInstallmentExpense,
+    balance: income - expense - installmentExpense,
     income,
-    expense,
-    totalTransactions: transactions.length,
-    latestTransactions: transactions.slice(0, 5),
-    expenseByCategory,
+    expense: expense + installmentExpense,
+    totalTransactions: transactions.length + installmentPayments.length,
+    latestTransactions,
+    expenseByCategory: expenseByCategory.sort((a, b) => b.total - a.total),
     upcomingInstallments: installmentPayments.slice(0, 5)
   };
 }

@@ -75,7 +75,40 @@ export default async function InstallmentsPage() {
                   </div>
                 </div>
 
-                <div className="mt-6 overflow-x-auto">
+                <div className="mt-6 grid gap-3 md:hidden">
+                  {plan.payments.map((payment) => (
+                    <div key={payment.id} className="rounded-2xl border border-[#eadfcb] bg-white px-4 py-4">
+                      <div className="flex items-start justify-between gap-3">
+                        <div>
+                          <p className="font-semibold text-stone-900">
+                            Cuota {payment.installmentNumber}/{plan.installmentCount}
+                          </p>
+                          <p className="mt-1 text-sm text-stone-500">Vence {formatDate(payment.dueDate)}</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="font-bold text-stone-900">{formatCurrency(Number(payment.amount))}</p>
+                          <span className={`mt-2 inline-flex rounded-full px-3 py-1 text-xs font-semibold ${statusClasses(payment.status)}`}>
+                            {statusLabel(payment.status)}
+                          </span>
+                        </div>
+                      </div>
+                      <form action={togglePayment} className="mt-4">
+                        <input type="hidden" name="id" value={payment.id} />
+                        <button
+                          className={`w-full rounded-xl px-3 py-2 text-xs font-semibold ${
+                            payment.status === "PAID"
+                              ? "bg-stone-200 text-stone-700"
+                              : "bg-brand-700 text-white"
+                          }`}
+                        >
+                          {payment.status === "PAID" ? "Marcar pendiente" : "Marcar pagada"}
+                        </button>
+                      </form>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="mt-6 hidden overflow-x-auto md:block">
                   <table className="min-w-[680px] text-left text-sm">
                     <thead className="text-stone-500">
                       <tr>
