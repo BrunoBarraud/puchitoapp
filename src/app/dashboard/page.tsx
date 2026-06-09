@@ -6,6 +6,10 @@ import { parseMonthYear } from "@/lib/utils";
 import { requireUser } from "@/lib/auth";
 import { getDashboardData } from "@/server/queries/dashboard";
 
+type DashboardData = Awaited<ReturnType<typeof getDashboardData>>;
+type LatestTransaction = DashboardData["latestTransactions"][number];
+type UpcomingInstallment = DashboardData["upcomingInstallments"][number];
+
 export default async function DashboardPage({
   searchParams
 }: {
@@ -62,7 +66,7 @@ export default async function DashboardPage({
                 Todavia no hay movimientos para este mes.
               </div>
             ) : (
-              data.latestTransactions.map((transaction) => (
+              data.latestTransactions.map((transaction: LatestTransaction) => (
                 <div key={transaction.id} className="rounded-[1.7rem] border border-[#eee3cf] bg-white px-4 py-4 shadow-[0_12px_28px_-24px_rgba(58,38,18,0.4)]">
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
@@ -132,7 +136,7 @@ export default async function DashboardPage({
                   No hay cuotas registradas para este mes.
                 </div>
               ) : (
-                data.upcomingInstallments.map((payment) => (
+                data.upcomingInstallments.map((payment: UpcomingInstallment) => (
                   <div key={payment.id} className="rounded-[1.5rem] bg-white px-4 py-4 shadow-[0_12px_28px_-24px_rgba(58,38,18,0.35)]">
                     <div className="flex items-start justify-between gap-3">
                       <div>
