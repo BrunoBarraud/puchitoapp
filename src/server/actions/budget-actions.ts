@@ -18,7 +18,7 @@ export async function saveBudgetAction(_: ActionState, formData: FormData): Prom
     });
 
     if (!parsed.success) {
-      return { success: false, message: parsed.error.issues[0]?.message ?? "Presupuesto invalido." };
+      return { success: false, message: parsed.error.issues[0]?.message ?? "Presupuesto inválido." };
     }
 
     const category = await prisma.category.findFirst({
@@ -26,7 +26,7 @@ export async function saveBudgetAction(_: ActionState, formData: FormData): Prom
     });
 
     if (!category) {
-      return { success: false, message: "El presupuesto debe usar una categoria de gasto." };
+      return { success: false, message: "El presupuesto debe usar una categoría de gasto." };
     }
 
     const payload = {

@@ -39,7 +39,7 @@ export async function importDataAction(_: ActionState, formData: FormData): Prom
     const parsed = importSchema.safeParse(parsedJson);
 
     if (!parsed.success) {
-      return { success: false, message: "La estructura del archivo importado no es valida." };
+      return { success: false, message: "La estructura del archivo importado no es válida." };
     }
 
     await prisma.$transaction(async (tx) => {

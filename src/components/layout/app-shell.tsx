@@ -30,7 +30,7 @@ export function AppShell({
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
             <div className="max-w-full rounded-2xl bg-white px-4 py-2 text-sm text-stone-700 shadow-inner break-all">{email}</div>
             <form action={logoutAction}>
-              <Button className="w-full rounded-2xl bg-stone-900 hover:bg-stone-700 sm:w-auto">Cerrar sesion</Button>
+              <Button className="w-full rounded-2xl bg-stone-900 hover:bg-stone-700 sm:w-auto">Cerrar sesión</Button>
             </form>
           </div>
           </div>

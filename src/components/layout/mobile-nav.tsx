@@ -11,11 +11,11 @@ const links: Array<{
   icon: typeof LayoutDashboard;
 }> = [
   { href: "/dashboard", label: "Inicio", icon: LayoutDashboard },
-  { href: "/transactions", label: "Movs.", icon: CircleDollarSign },
+  { href: "/transactions", label: "Mov.", icon: CircleDollarSign },
   { href: "/categories", label: "Cat.", icon: Tags },
-  { href: "/budgets", label: "Presu.", icon: BadgeDollarSign },
+  { href: "/budgets", label: "Presup.", icon: BadgeDollarSign },
   { href: "/installments", label: "Cuotas", icon: CreditCard },
-  { href: "/reports", label: "Grafs.", icon: ChartColumnBig },
+  { href: "/reports", label: "Gráfs.", icon: ChartColumnBig },
   { href: "/settings", label: "Config.", icon: Settings2 }
 ];
 

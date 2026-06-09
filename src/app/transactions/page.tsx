@@ -56,7 +56,7 @@ export default async function TransactionsPage({
               <option value="EXPENSE">Gasto</option>
             </select>
             <select name="categoryId" defaultValue={params.categoryId ?? ""} className="rounded-2xl border px-4 py-2.5 text-sm">
-              <option value="">Todas las categorias</option>
+              <option value="">Todas las categorías</option>
               {categories.map((category) => (
                 <option key={category.id} value={category.id}>
                   {category.name}

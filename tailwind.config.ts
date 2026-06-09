@@ -25,7 +25,8 @@ const config: Config = {
         danger: "#dc2626"
       },
       fontFamily: {
-        sans: ["var(--font-sans)"]
+        sans: ["var(--font-sans)"],
+        display: ["var(--font-display)"]
       },
       boxShadow: {
         soft: "0 20px 45px -25px rgba(32, 24, 16, 0.35)"

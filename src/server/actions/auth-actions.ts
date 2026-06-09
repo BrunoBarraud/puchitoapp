@@ -54,7 +54,7 @@ export async function loginAction(_: ActionState, formData: FormData): Promise<A
     });
 
     if (!parsed.success) {
-      return { success: false, message: parsed.error.issues[0]?.message ?? "Credenciales invalidas." };
+      return { success: false, message: parsed.error.issues[0]?.message ?? "Credenciales inválidas." };
     }
 
     const user = await prisma.user.findUnique({
@@ -62,18 +62,18 @@ export async function loginAction(_: ActionState, formData: FormData): Promise<A
     });
 
     if (!user) {
-      return { success: false, message: "Credenciales invalidas." };
+      return { success: false, message: "Credenciales inválidas." };
     }
 
     const validPassword = await bcrypt.compare(parsed.data.password, user.passwordHash);
 
     if (!validPassword) {
-      return { success: false, message: "Credenciales invalidas." };
+      return { success: false, message: "Credenciales inválidas." };
     }
 
     await createSession(user.id);
   } catch (error) {
-    return { success: false, message: "No se pudo iniciar sesion." };
+    return { success: false, message: "No se pudo iniciar sesión." };
   }
 
   redirect("/dashboard");

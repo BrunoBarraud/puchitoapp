@@ -54,7 +54,7 @@ export async function saveTransactionAction(_: ActionState, formData: FormData):
     });
 
     if (!category) {
-      return { success: false, message: "La categoria no existe para este usuario." };
+      return { success: false, message: "La categoría no existe para este usuario." };
     }
 
     if (parsed.data.id) {
@@ -70,7 +70,7 @@ export async function saveTransactionAction(_: ActionState, formData: FormData):
       if (existing.installmentPlan) {
         return {
           success: false,
-          message: "Las compras en cuotas se editan desde la seccion de cuotas."
+          message: "Las compras en cuotas se editan desde la sección de cuotas."
         };
       }
 

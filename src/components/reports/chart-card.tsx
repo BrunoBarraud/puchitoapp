@@ -24,7 +24,7 @@ export function MonthlyComparisonChart({ data }: { data: Array<{ month: string; 
 export function CategoryExpenseChart({ data }: { data: Array<{ name: string; total: number; color: string }> }) {
   return (
     <Card className="h-96">
-      <p className="mb-4 text-lg font-bold">Gastos por categoria</p>
+      <p className="mb-4 text-lg font-bold">Gastos por categoría</p>
       <ResponsiveContainer width="100%" height="90%">
         <PieChart>
           <Pie data={data} dataKey="total" nameKey="name" innerRadius={70} outerRadius={110}>

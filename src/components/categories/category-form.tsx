@@ -10,7 +10,7 @@ import { saveCategoryAction } from "@/server/actions/category-actions";
 export function CategoryForm({ category }: { category?: Category | null }) {
   return (
     <Card>
-      <h2 className="text-xl font-bold">{category ? "Editar categoria" : "Nueva categoria"}</h2>
+      <h2 className="text-xl font-bold">{category ? "Editar categoría" : "Nueva categoría"}</h2>
       <ClientActionForm action={saveCategoryAction} className="mt-5 space-y-4">
         <input type="hidden" name="id" defaultValue={category?.id} />
         <div className="grid gap-4 md:grid-cols-2">
@@ -30,7 +30,7 @@ export function CategoryForm({ category }: { category?: Category | null }) {
             <Input name="icon" defaultValue={category?.icon ?? ""} placeholder="Wallet, Bus, Gift..." />
           </Field>
         </div>
-        <Button pendingLabel="Guardando categoria...">{category ? "Actualizar categoria" : "Crear categoria"}</Button>
+        <Button pendingLabel="Guardando categoría...">{category ? "Actualizar categoría" : "Crear categoría"}</Button>
       </ClientActionForm>
     </Card>
   );

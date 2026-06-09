@@ -15,8 +15,8 @@ export default async function LoginPage() {
     <div className="flex min-h-screen items-center justify-center p-6">
       <AuthCard
         title="Bienvenido de nuevo"
-        description="Inicia sesion y manten bajo control esos gastos chicos que se escapan."
-        footerText="Todavia no tenes cuenta?"
+        description="Iniciá sesión y mantené bajo control esos gastos chicos que se escapan."
+        footerText="¿Todavía no tenés cuenta?"
         footerLink="/register"
         footerLabel="Crear cuenta"
       >
@@ -24,11 +24,11 @@ export default async function LoginPage() {
           <Field label="Email">
             <Input name="email" type="email" required />
           </Field>
-          <Field label="Contrasena">
+          <Field label="Contraseña">
             <Input name="password" type="password" required />
           </Field>
           <Button pendingLabel="Ingresando..." className="w-full">
-            Iniciar sesion
+            Iniciar sesión
           </Button>
         </ClientActionForm>
       </AuthCard>

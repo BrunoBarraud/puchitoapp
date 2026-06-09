@@ -14,17 +14,17 @@ export default async function RegisterPage() {
   return (
     <div className="flex min-h-screen items-center justify-center p-6">
       <AuthCard
-        title="Crea tu cuenta"
-        description="Empeza a registrar ingresos, gastos y presupuestos en un solo lugar."
-        footerText="Ya estas registrado?"
+        title="Creá tu cuenta"
+        description="Empezá a registrar ingresos, gastos y presupuestos en un solo lugar."
+        footerText="¿Ya estás registrado?"
         footerLink="/login"
-        footerLabel="Iniciar sesion"
+        footerLabel="Iniciar sesión"
       >
         <ClientActionForm action={registerAction} className="space-y-4">
           <Field label="Email">
             <Input name="email" type="email" required />
           </Field>
-          <Field label="Contrasena">
+          <Field label="Contraseña">
             <Input name="password" type="password" minLength={6} required />
           </Field>
           <Button pendingLabel="Creando cuenta..." className="w-full">

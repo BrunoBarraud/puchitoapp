@@ -16,7 +16,7 @@ export default async function ReportsPage() {
         <CategoryExpenseChart data={report.categoryTotals} />
         <BalanceLineChart data={report.monthly} />
         <Card>
-          <h2 className="text-xl font-bold">Top 5 categorias con mas gasto</h2>
+          <h2 className="text-xl font-bold">Top 5 categorías con más gasto</h2>
           <div className="mt-5 space-y-4">
             {report.topCategories.map((category, index) => (
               <div key={category.name} className="flex items-center justify-between rounded-2xl bg-stone-50 px-4 py-3">

@@ -18,7 +18,7 @@ export async function saveCategoryAction(_: ActionState, formData: FormData): Pr
     });
 
     if (!parsed.success) {
-      return { success: false, message: parsed.error.issues[0]?.message ?? "Categoria invalida." };
+      return { success: false, message: parsed.error.issues[0]?.message ?? "Categoría inválida." };
     }
 
     const payload = {
@@ -34,7 +34,7 @@ export async function saveCategoryAction(_: ActionState, formData: FormData): Pr
       });
 
       if (!existing) {
-        return { success: false, message: "No se encontro la categoria." };
+        return { success: false, message: "No se encontró la categoría." };
       }
 
       await prisma.category.update({
@@ -58,7 +58,7 @@ export async function saveCategoryAction(_: ActionState, formData: FormData): Pr
 
     return { success: true, message: parsed.data.id ? "Categoria actualizada." : "Categoria creada." };
   } catch (error) {
-    return { success: false, message: "No se pudo guardar la categoria." };
+    return { success: false, message: "No se pudo guardar la categoría." };
   }
 }
 
@@ -74,13 +74,13 @@ export async function deleteCategoryAction(id: string): Promise<ActionState> {
     });
 
     if (!existing) {
-      return { success: false, message: "No se encontro la categoria." };
+      return { success: false, message: "No se encontró la categoría." };
     }
 
     if (existing.transactions.length > 0 || existing.budgets.length > 0) {
       return {
         success: false,
-        message: "Esta categoria esta siendo usada por movimientos o presupuestos."
+        message: "Esta categoría está siendo usada por movimientos o presupuestos."
       };
     }
 
@@ -93,6 +93,6 @@ export async function deleteCategoryAction(id: string): Promise<ActionState> {
 
     return { success: true, message: "Categoria eliminada." };
   } catch (error) {
-    return { success: false, message: "No se pudo eliminar la categoria." };
+    return { success: false, message: "No se pudo eliminar la categoría." };
   }
 }

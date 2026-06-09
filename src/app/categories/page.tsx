@@ -31,7 +31,7 @@ export default async function CategoriesPage({
       <div className="grid gap-6 xl:grid-cols-[0.85fr_1.15fr]">
         <CategoryForm category={categoryToEdit} />
         <Card>
-          <h2 className="text-xl font-bold">Tus categorias</h2>
+          <h2 className="text-xl font-bold">Tus categorías</h2>
           <div className="mt-5 grid gap-3 md:grid-cols-2">
             {categories.map((category) => (
               <div key={category.id} className="rounded-2xl border border-stone-200 bg-stone-50 p-4">

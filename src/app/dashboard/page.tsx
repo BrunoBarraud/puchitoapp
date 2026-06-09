@@ -27,7 +27,7 @@ export default async function DashboardPage({
         <MetricCard label="Balance" value={formatCurrency(data.balance)} accent="#7d5928" />
         <MetricCard label="Ingresos" value={formatCurrency(data.income)} accent="#16a34a" />
         <MetricCard label="Gastos" value={formatCurrency(data.expense)} accent="#dc2626" />
-        <MetricCard label="Movs." value={String(data.totalTransactions)} accent="#0284c7" />
+        <MetricCard label="Movimientos" value={String(data.totalTransactions)} accent="#0284c7" />
       </section>
 
       <section className="grid gap-5 xl:grid-cols-[1.1fr_0.9fr]">
@@ -36,7 +36,7 @@ export default async function DashboardPage({
             <div className="flex flex-col gap-4">
               <div>
                 <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-brand-700">Actividad reciente</p>
-                <h2 className="mt-1 text-2xl font-black tracking-tight text-stone-900">Ultimos movimientos</h2>
+                <h2 className="mt-1 text-2xl font-black tracking-tight text-stone-900">Últimos movimientos</h2>
                 <p className="mt-1 text-sm text-stone-500">{getMonthLabel(month, year)}</p>
               </div>
               <form className="grid grid-cols-[0.8fr_1fr_1fr] gap-2 sm:max-w-md">
@@ -64,7 +64,7 @@ export default async function DashboardPage({
           <div className="space-y-3 px-4 py-4 sm:px-5 sm:py-5">
             {data.latestTransactions.length === 0 ? (
               <div className="rounded-[1.5rem] bg-[#fff5e7] px-4 py-5 text-sm text-stone-600">
-                Todavia no hay movimientos para este mes.
+                Todavía no hay movimientos para este mes.
               </div>
             ) : (
               data.latestTransactions.map((transaction: LatestTransaction) => (
@@ -96,14 +96,14 @@ export default async function DashboardPage({
           <Card>
             <div className="flex items-center justify-between gap-3">
               <div>
-                <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-brand-700">Distribucion</p>
-                <h2 className="mt-1 text-2xl font-black tracking-tight text-stone-900">Gasto por categoria</h2>
+                <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-brand-700">Distribución</p>
+                <h2 className="mt-1 text-2xl font-black tracking-tight text-stone-900">Gasto por categoría</h2>
               </div>
             </div>
             <div className="mt-5 space-y-4">
               {data.expenseByCategory.length === 0 ? (
                 <div className="rounded-[1.5rem] bg-[#fff5e7] px-4 py-5 text-sm text-stone-600">
-                  No se usaron categorias de gasto este mes.
+                  No se usaron categorías de gasto este mes.
                 </div>
               ) : (
                 data.expenseByCategory.map((item: ExpenseByCategoryItem) => (
@@ -125,7 +125,7 @@ export default async function DashboardPage({
             <div className="flex items-center justify-between gap-3">
               <div>
                 <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-brand-700">Seguimiento</p>
-                <h2 className="mt-1 text-2xl font-black tracking-tight text-stone-900">Proximas cuotas</h2>
+                <h2 className="mt-1 text-2xl font-black tracking-tight text-stone-900">Próximas cuotas</h2>
               </div>
               <a href="/installments" className="text-sm font-semibold text-brand-700">
                 Ver todas

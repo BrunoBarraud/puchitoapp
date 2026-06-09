@@ -120,7 +120,7 @@ export function TransactionForm({
             ) : null}
             {transaction?.installmentPlan ? (
               <p className="mt-3 text-sm text-brand-700">
-                Esta compra ya tiene un plan de cuotas generado. Los cambios se administran desde la seccion Cuotas.
+                Esta compra ya tiene un plan de cuotas generado. Los cambios se administran desde la sección Cuotas.
               </p>
             ) : null}
           </div>

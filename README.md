@@ -44,9 +44,9 @@ npm run dev
 
 ## Que incluye
 
-- Registro e inicio de sesion con cookie httpOnly firmada
-- Dashboard mensual con metricas, resumen y ultimos movimientos
-- CRUD de transacciones, categorias y presupuestos
+- Registro e inicio de sesión con cookie httpOnly firmada
+- Dashboard mensual con métricas, resumen y últimos movimientos
+- CRUD de transacciones, categorías y presupuestos
 - Reportes con Recharts
 - Importacion y exportacion JSON por usuario
 - Rutas protegidas para usuarios autenticados
@@ -66,6 +66,6 @@ npm run dev
 
 ## Notas
 
-- Las categorias por defecto se crean automaticamente al registrarse un usuario.
+- Las categorías por defecto se crean automáticamente al registrarse un usuario.
 - La importacion reasigna siempre `userId` al usuario autenticado.
 - Los datos principales viven en PostgreSQL, no en `localStorage`.

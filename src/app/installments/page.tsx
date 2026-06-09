@@ -36,7 +36,7 @@ export default async function InstallmentsPage() {
         <Card>
           <h2 className="text-xl font-bold">Compras en cuotas</h2>
           <p className="mt-2 text-sm text-stone-600">
-            Registra cuanto te falta pagar, los vencimientos y si cada cuota ya fue abonada o no.
+            Registrá cuánto te falta pagar, los vencimientos y si cada cuota ya fue abonada o no.
           </p>
         </Card>
         <div className="grid gap-6">
@@ -123,7 +123,7 @@ export default async function InstallmentsPage() {
           })}
           {plans.length === 0 ? (
             <Card>
-              <p className="text-sm text-stone-500">Todavia no cargaste compras en cuotas.</p>
+              <p className="text-sm text-stone-500">Todavía no cargaste compras en cuotas.</p>
             </Card>
           ) : null}
         </div>

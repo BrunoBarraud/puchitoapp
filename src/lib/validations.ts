@@ -1,23 +1,39 @@
 import { z } from "zod";
 
 export const authSchema = z.object({
-  email: z.string().email("Ingresa un email valido."),
-  password: z.string().min(6, "La contrasena debe tener al menos 6 caracteres.")
+  email: z.string().email("Ingresá un email válido."),
+  password: z.string().min(6, "La contraseña debe tener al menos 6 caracteres.")
 });
 
 const transactionBaseSchema = z.object({
   id: z.string().optional(),
-  title: z.string().min(2, "El titulo es demasiado corto.").max(100),
+  title: z.string().min(2, "El título es demasiado corto.").max(100),
   amount: z.coerce.number().positive("El monto debe ser mayor a 0."),
   type: z.enum(["INCOME", "EXPENSE"]),
-  categoryId: z.string().min(1, "La categoria es obligatoria."),
+  categoryId: z.string().min(1, "La categoría es obligatoria."),
   date: z.coerce.date(),
   notes: z.string().max(300).optional().or(z.literal("")),
   isInstallment: z
     .union([z.literal("on"), z.literal("true"), z.literal("false"), z.undefined()])
     .transform((value) => value === "on" || value === "true"),
-  installmentCount: z.coerce.number().int().min(1).max(60).optional(),
-  firstDueDate: z.string().optional().or(z.literal(""))
+  installmentCount: z.preprocess(
+    (value) => {
+      if (value === "" || value === null || value === undefined) {
+        return undefined;
+      }
+      return value;
+    },
+    z.coerce.number().int().min(1).max(60).optional()
+  ),
+  firstDueDate: z.preprocess(
+    (value) => {
+      if (value === "" || value === null || value === undefined) {
+        return undefined;
+      }
+      return value;
+    },
+    z.string().optional()
+  )
 });
 
 export const transactionSchema = transactionBaseSchema.superRefine((data, ctx) => {
