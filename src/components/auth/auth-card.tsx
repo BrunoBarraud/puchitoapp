@@ -19,9 +19,9 @@ export function AuthCard({
   children: React.ReactNode;
 }) {
   return (
-    <Card className="w-full max-w-md border-stone-200 bg-white/90 p-8">
-      <Logo />
-      <div className="mt-8">
+    <Card className="w-full max-w-md border-stone-200 bg-[#fffaf2]/95 p-6 sm:p-8">
+      <Logo clean />
+      <div className="mt-7">
         <h1 className="text-3xl font-black tracking-tight text-stone-900">{title}</h1>
         <p className="mt-2 text-sm text-stone-600">{description}</p>
       </div>
