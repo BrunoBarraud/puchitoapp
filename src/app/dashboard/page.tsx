@@ -23,7 +23,7 @@ export default async function DashboardPage({
 
   return (
     <AppShell pathname="/dashboard" email={user.email} title="Resumen">
-      <section className="grid grid-cols-2 gap-4 xl:grid-cols-4">
+      <section className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4">
         <MetricCard label="Balance" value={formatCurrency(data.balance)} accent="#7d5928" />
         <MetricCard label="Ingresos" value={formatCurrency(data.income)} accent="#16a34a" />
         <MetricCard label="Gastos" value={formatCurrency(data.expense)} accent="#dc2626" />
@@ -32,14 +32,14 @@ export default async function DashboardPage({
 
       <section className="grid gap-5 xl:grid-cols-[1.1fr_0.9fr]">
         <Card className="p-0">
-          <div className="border-b border-[#efe2ca] px-5 py-5">
+          <div className="border-b border-[#efe2ca] px-4 py-5 sm:px-5">
             <div className="flex flex-col gap-4">
               <div>
                 <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-brand-700">Actividad reciente</p>
                 <h2 className="mt-1 text-2xl font-black tracking-tight text-stone-900">Últimos movimientos</h2>
                 <p className="mt-1 text-sm text-stone-500">{getMonthLabel(month, year)}</p>
               </div>
-              <form className="grid grid-cols-[0.8fr_1fr_1fr] gap-2 sm:max-w-md">
+              <form className="grid grid-cols-[0.8fr_1fr_0.9fr] gap-2 sm:max-w-md">
                 <input
                   name="month"
                   type="number"
@@ -56,7 +56,7 @@ export default async function DashboardPage({
                   defaultValue={year}
                   className="rounded-2xl border border-[#e6d7bd] bg-white px-3 py-2.5 text-sm shadow-inner"
                 />
-                <button className="rounded-2xl bg-stone-900 px-4 py-2.5 text-sm font-semibold text-brand-100">Ver</button>
+                <button className="rounded-2xl bg-stone-900 px-3 py-2.5 text-sm font-semibold text-brand-100">Ver</button>
               </form>
             </div>
           </div>
@@ -107,7 +107,7 @@ export default async function DashboardPage({
                 </div>
               ) : (
                 data.expenseByCategory.map((item: ExpenseByCategoryItem) => (
-                  <div key={item.categoryId} className="rounded-[1.5rem] bg-white px-4 py-4 shadow-[0_12px_28px_-24px_rgba(58,38,18,0.35)]">
+                  <div key={item.categoryId} className="min-w-0 rounded-[1.5rem] bg-white px-4 py-4 shadow-[0_12px_28px_-24px_rgba(58,38,18,0.35)]">
                     <div className="mb-3 flex items-center justify-between gap-3 text-sm">
                       <span className="font-semibold text-stone-900">{item.name}</span>
                       <span className="font-semibold text-stone-700">{formatCurrency(item.total)}</span>

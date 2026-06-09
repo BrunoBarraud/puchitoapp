@@ -24,8 +24,18 @@ export const metadata: Metadata = {
     title: "Puchito App"
   },
   icons: {
-    icon: "/logo-puchito-app.png",
-    apple: "/logo-puchito-app.png"
+    icon: [
+      {
+        url: "/favicon.png",
+        type: "image/png"
+      }
+    ],
+    apple: [
+      {
+        url: "/favicon.png",
+        type: "image/png"
+      }
+    ]
   }
 };
 

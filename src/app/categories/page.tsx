@@ -27,7 +27,7 @@ export default async function CategoriesPage({
   }
 
   return (
-    <AppShell pathname="/categories" email={user.email} title="Categorias">
+    <AppShell pathname="/categories" email={user.email} title="Categorías">
       <div className="grid gap-6 xl:grid-cols-[0.85fr_1.15fr]">
         <CategoryForm category={categoryToEdit} />
         <Card>
@@ -36,14 +36,14 @@ export default async function CategoriesPage({
             {categories.map((category) => (
               <div key={category.id} className="rounded-2xl border border-stone-200 bg-stone-50 p-4">
                 <div className="flex items-center justify-between gap-3">
-                  <p className="font-semibold">{category.name}</p>
-                  <span className={`rounded-full px-3 py-1 text-xs font-semibold ${category.type === "INCOME" ? "bg-emerald-100 text-emerald-700" : "bg-rose-100 text-rose-700"}`}>
+                  <p className="min-w-0 truncate font-semibold">{category.name}</p>
+                  <span className={`shrink-0 rounded-full px-3 py-1 text-xs font-semibold ${category.type === "INCOME" ? "bg-emerald-100 text-emerald-700" : "bg-rose-100 text-rose-700"}`}>
                     {category.type === "INCOME" ? "Ingreso" : "Gasto"}
                   </span>
                 </div>
                 <div className="mt-3 flex items-center gap-2 text-sm text-stone-600">
-                  <span className="h-3 w-3 rounded-full" style={{ backgroundColor: category.color ?? "#78716c" }} />
-                  {category.icon ?? "Sin icono"}
+                  <span className="h-3 w-3 shrink-0 rounded-full" style={{ backgroundColor: category.color ?? "#78716c" }} />
+                  <span className="min-w-0 truncate">{category.icon ?? "Sin icono"}</span>
                 </div>
                 <div className="mt-4 flex flex-wrap gap-2">
                   <a href={`/categories?editId=${category.id}`} className="rounded-xl border px-3 py-1.5 text-xs font-semibold">

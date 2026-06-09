@@ -48,9 +48,9 @@ export default async function BudgetsPage({
         <Card>
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <h2 className="text-xl font-bold">Presupuestos mensuales</h2>
-            <form className="grid grid-cols-3 gap-2">
-              <input name="month" type="number" min="1" max="12" defaultValue={month} className="w-20 rounded-xl border px-3 py-2 text-sm" />
-              <input name="year" type="number" min="2000" max="2100" defaultValue={year} className="w-24 rounded-xl border px-3 py-2 text-sm" />
+            <form className="grid w-full grid-cols-[0.8fr_1fr_0.9fr] gap-2 md:w-auto">
+              <input name="month" type="number" min="1" max="12" defaultValue={month} className="min-w-0 rounded-xl border px-3 py-2 text-sm" />
+              <input name="year" type="number" min="2000" max="2100" defaultValue={year} className="min-w-0 rounded-xl border px-3 py-2 text-sm" />
               <button className="rounded-xl bg-stone-900 px-4 py-2 text-sm font-semibold text-white">Ver</button>
             </form>
           </div>
@@ -64,7 +64,7 @@ export default async function BudgetsPage({
               return (
                 <div key={budget.id} className="rounded-2xl border border-stone-200 p-4">
                   <div className="flex items-center justify-between gap-3">
-                    <div>
+                    <div className="min-w-0">
                       <p className="font-semibold">{budget.category.name}</p>
                       <p className="text-sm text-stone-500">
                         {formatCurrency(spent)} de {formatCurrency(total)}

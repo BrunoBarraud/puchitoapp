@@ -19,12 +19,12 @@ export default async function ReportsPage() {
           <h2 className="text-xl font-bold">Top 5 categorías con más gasto</h2>
           <div className="mt-5 space-y-4">
             {report.topCategories.map((category, index) => (
-              <div key={category.name} className="flex items-center justify-between rounded-2xl bg-stone-50 px-4 py-3">
-                <div className="flex items-center gap-3">
-                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-100 text-sm font-bold text-brand-800">{index + 1}</span>
-                  <span className="font-semibold">{category.name}</span>
+              <div key={category.name} className="flex min-w-0 items-center justify-between gap-3 rounded-2xl bg-stone-50 px-4 py-3">
+                <div className="flex min-w-0 items-center gap-3">
+                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand-100 text-sm font-bold text-brand-800">{index + 1}</span>
+                  <span className="min-w-0 truncate font-semibold">{category.name}</span>
                 </div>
-                <span className="font-bold">{formatCurrency(category.total)}</span>
+                <span className="shrink-0 font-bold">{formatCurrency(category.total)}</span>
               </div>
             ))}
           </div>

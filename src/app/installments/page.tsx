@@ -49,13 +49,13 @@ export default async function InstallmentsPage() {
             return (
               <Card key={plan.id}>
                 <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-                  <div>
+                  <div className="min-w-0">
                     <h3 className="text-xl font-bold text-stone-900">{plan.transaction.title}</h3>
                     <p className="mt-1 text-sm text-stone-500">
                       {plan.category.name} - compra total {formatCurrency(Number(plan.totalAmount))}
                     </p>
                   </div>
-                  <div className="rounded-2xl bg-stone-100 px-4 py-3 text-sm text-stone-700">
+                  <div className="shrink-0 rounded-2xl bg-stone-100 px-4 py-3 text-sm text-stone-700">
                     {paidCount}/{plan.installmentCount} cuotas pagadas
                   </div>
                 </div>
@@ -76,7 +76,7 @@ export default async function InstallmentsPage() {
                 </div>
 
                 <div className="mt-6 overflow-x-auto">
-                  <table className="min-w-full text-left text-sm">
+                  <table className="min-w-[680px] text-left text-sm">
                     <thead className="text-stone-500">
                       <tr>
                         <th className="pb-3">Cuota</th>

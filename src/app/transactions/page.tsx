@@ -49,13 +49,13 @@ export default async function TransactionsPage({
         <TransactionForm categories={categories} transaction={transactionToEdit} />
         <Card>
           <form className="grid gap-3 sm:grid-cols-2 xl:grid-cols-6">
-            <input name="query" placeholder="Buscar por titulo" defaultValue={params.query ?? ""} className="rounded-2xl border px-4 py-2.5 text-sm sm:col-span-2 xl:col-span-2" />
-            <select name="type" defaultValue={params.type ?? ""} className="rounded-2xl border px-4 py-2.5 text-sm">
+            <input name="query" placeholder="Buscar por título" defaultValue={params.query ?? ""} className="min-w-0 rounded-2xl border px-4 py-2.5 text-sm sm:col-span-2 xl:col-span-2" />
+            <select name="type" defaultValue={params.type ?? ""} className="min-w-0 rounded-2xl border px-4 py-2.5 text-sm">
               <option value="">Todos los tipos</option>
               <option value="INCOME">Ingreso</option>
               <option value="EXPENSE">Gasto</option>
             </select>
-            <select name="categoryId" defaultValue={params.categoryId ?? ""} className="rounded-2xl border px-4 py-2.5 text-sm">
+            <select name="categoryId" defaultValue={params.categoryId ?? ""} className="min-w-0 rounded-2xl border px-4 py-2.5 text-sm">
               <option value="">Todas las categorías</option>
               {categories.map((category) => (
                 <option key={category.id} value={category.id}>
@@ -63,12 +63,12 @@ export default async function TransactionsPage({
                 </option>
               ))}
             </select>
-            <input name="month" type="number" min="1" max="12" defaultValue={month} className="rounded-2xl border px-4 py-2.5 text-sm" />
-            <input name="year" type="number" min="2000" max="2100" defaultValue={year} className="rounded-2xl border px-4 py-2.5 text-sm" />
+            <input name="month" type="number" min="1" max="12" defaultValue={month} className="min-w-0 rounded-2xl border px-4 py-2.5 text-sm" />
+            <input name="year" type="number" min="2000" max="2100" defaultValue={year} className="min-w-0 rounded-2xl border px-4 py-2.5 text-sm" />
             <button className="rounded-2xl bg-stone-900 px-4 py-2.5 text-sm font-semibold text-white">Filtrar</button>
           </form>
           <div className="mt-5 overflow-x-auto">
-            <table className="min-w-full text-left text-sm">
+            <table className="min-w-[680px] text-left text-sm">
               <thead className="text-stone-500">
                 <tr>
                   <th className="pb-3">Titulo</th>
