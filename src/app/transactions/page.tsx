@@ -18,7 +18,7 @@ export default async function TransactionsPage({
   const { month, year } = parseMonthYear(params);
   const categories = await prisma.category.findMany({ where: { userId: user.id }, orderBy: [{ type: "asc" }, { name: "asc" }] });
   const transactionToEdit = params.editId
-    ? await prisma.transaction.findFirst({ where: { id: params.editId, userId: user.id } })
+    ? await prisma.transaction.findFirst({ where: { id: params.editId, userId: user.id }, include: { installmentPlan: true } })
     : null;
   const transactions = await prisma.transaction.findMany({
     where: transactionSearchWhere(user.id, {
@@ -28,7 +28,10 @@ export default async function TransactionsPage({
       categoryId: params.categoryId,
       query: params.query
     }),
-    include: { category: true },
+    include: {
+      category: true,
+      installmentPlan: true
+    },
     orderBy: { date: "desc" }
   });
 
@@ -72,6 +75,7 @@ export default async function TransactionsPage({
                   <th className="pb-3">Categoria</th>
                   <th className="pb-3">Fecha</th>
                   <th className="pb-3">Monto</th>
+                  <th className="pb-3">Cuotas</th>
                   <th className="pb-3">Acciones</th>
                 </tr>
               </thead>
@@ -83,6 +87,15 @@ export default async function TransactionsPage({
                     <td className="py-3">{formatDate(transaction.date)}</td>
                     <td className={`py-3 font-bold ${transaction.type === "INCOME" ? "text-emerald-600" : "text-rose-600"}`}>
                       {formatCurrency(Number(transaction.amount))}
+                    </td>
+                    <td className="py-3">
+                      {transaction.installmentPlan ? (
+                        <span className="rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-800">
+                          {transaction.installmentPlan.installmentCount} cuotas
+                        </span>
+                      ) : (
+                        <span className="text-xs text-stone-400">-</span>
+                      )}
                     </td>
                     <td className="py-3">
                       <div className="flex flex-wrap gap-2">

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Category, Transaction } from "@prisma/client";
+import { Category, InstallmentPlan, Transaction } from "@prisma/client";
 import { ClientActionForm } from "@/components/ui/client-action-form";
 import { Button } from "@/components/ui/button";
 import { Field } from "@/components/ui/field";
@@ -16,11 +16,12 @@ export function TransactionForm({
   transaction
 }: {
   categories: Category[];
-  transaction?: Transaction | null;
+  transaction?: (Transaction & { installmentPlan?: InstallmentPlan | null }) | null;
 }) {
   const [type, setType] = useState(transaction?.type ?? "EXPENSE");
   const filteredCategories = categories.filter((category) => category.type === type);
   const [categoryId, setCategoryId] = useState(transaction?.categoryId ?? filteredCategories[0]?.id ?? "");
+  const [isInstallment, setIsInstallment] = useState(Boolean(transaction?.installmentPlan));
 
   useEffect(() => {
     const nextCategory = filteredCategories.find((category) => category.id === categoryId);
@@ -29,11 +30,18 @@ export function TransactionForm({
     }
   }, [filteredCategories, categoryId]);
 
+  useEffect(() => {
+    if (type !== "EXPENSE") {
+      setIsInstallment(false);
+    }
+  }, [type]);
+
   return (
     <Card>
       <h2 className="text-xl font-bold">{transaction ? "Editar movimiento" : "Nuevo movimiento"}</h2>
       <ClientActionForm action={saveTransactionAction} className="mt-5 space-y-4">
         <input type="hidden" name="id" defaultValue={transaction?.id} />
+        <input type="hidden" name="isInstallment" value={isInstallment ? "true" : "false"} />
         <div className="grid gap-4 md:grid-cols-2">
           <Field label="Titulo">
             <Input name="title" defaultValue={transaction?.title} placeholder="Supermercado, sueldo..." required />
@@ -65,6 +73,58 @@ export function TransactionForm({
             />
           </Field>
         </div>
+        {type === "EXPENSE" ? (
+          <div className="rounded-2xl border border-stone-200 bg-stone-50 p-4">
+            <label className="flex items-start gap-3">
+              <input
+                type="checkbox"
+                checked={isInstallment}
+                onChange={(event) => setIsInstallment(event.target.checked)}
+                disabled={Boolean(transaction?.installmentPlan)}
+                className="mt-1 h-4 w-4 rounded border-stone-300"
+              />
+              <span>
+                <span className="block font-semibold text-stone-900">Es una compra en cuotas</span>
+                <span className="block text-sm text-stone-600">
+                  Registra una compra financiada y genera automaticamente cada cuota.
+                </span>
+              </span>
+            </label>
+            {isInstallment ? (
+              <div className="mt-4 grid gap-4 md:grid-cols-2">
+                <Field label="Cantidad de cuotas">
+                  <Input
+                    name="installmentCount"
+                    type="number"
+                    min="2"
+                    max="60"
+                    defaultValue={transaction?.installmentPlan?.installmentCount ?? 2}
+                    disabled={Boolean(transaction?.installmentPlan)}
+                    required={isInstallment}
+                  />
+                </Field>
+                <Field label="Primer vencimiento">
+                  <Input
+                    name="firstDueDate"
+                    type="date"
+                    defaultValue={
+                      transaction?.installmentPlan?.firstDueDate
+                        ? new Date(transaction.installmentPlan.firstDueDate).toISOString().slice(0, 10)
+                        : new Date().toISOString().slice(0, 10)
+                    }
+                    disabled={Boolean(transaction?.installmentPlan)}
+                    required={isInstallment}
+                  />
+                </Field>
+              </div>
+            ) : null}
+            {transaction?.installmentPlan ? (
+              <p className="mt-3 text-sm text-brand-700">
+                Esta compra ya tiene un plan de cuotas generado. Los cambios se administran desde la seccion Cuotas.
+              </p>
+            ) : null}
+          </div>
+        ) : null}
         <Field label="Notas">
           <Textarea name="notes" defaultValue={transaction?.notes ?? ""} placeholder="Notas opcionales" />
         </Field>

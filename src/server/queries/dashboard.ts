@@ -18,11 +18,18 @@ export async function getDashboardData(userId: string, month: number, year: numb
     }
   };
 
-  const [transactions, groupedCategories] = await Promise.all([
+  const [transactions, groupedCategories, installmentPayments] = await Promise.all([
     prisma.transaction.findMany({
       where: filter,
       include: {
-        category: true
+        category: true,
+        installmentPlan: {
+          include: {
+            payments: {
+              orderBy: { installmentNumber: "asc" }
+            }
+          }
+        }
       },
       orderBy: {
         date: "desc"
@@ -36,6 +43,25 @@ export async function getDashboardData(userId: string, month: number, year: numb
       },
       _sum: {
         amount: true
+      }
+    }),
+    prisma.installmentPayment.findMany({
+      where: {
+        userId,
+        dueDate: {
+          gte: start,
+          lt: end
+        }
+      },
+      include: {
+        plan: {
+          include: {
+            transaction: true
+          }
+        }
+      },
+      orderBy: {
+        dueDate: "asc"
       }
     })
   ]);
@@ -71,7 +97,8 @@ export async function getDashboardData(userId: string, month: number, year: numb
     expense,
     totalTransactions: transactions.length,
     latestTransactions: transactions.slice(0, 5),
-    expenseByCategory
+    expenseByCategory,
+    upcomingInstallments: installmentPayments.slice(0, 5)
   };
 }
 
@@ -157,4 +184,20 @@ export function transactionSearchWhere(
   }
 
   return where;
+}
+
+export async function getInstallmentPlans(userId: string) {
+  return prisma.installmentPlan.findMany({
+    where: { userId },
+    include: {
+      category: true,
+      transaction: true,
+      payments: {
+        orderBy: { installmentNumber: "asc" }
+      }
+    },
+    orderBy: {
+      createdAt: "desc"
+    }
+  });
 }

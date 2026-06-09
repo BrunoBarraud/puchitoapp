@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import type { Route } from "next";
-import { BadgeDollarSign, ChartColumnBig, CircleDollarSign, LayoutDashboard, Settings2, Tags } from "lucide-react";
+import { BadgeDollarSign, ChartColumnBig, CircleDollarSign, CreditCard, LayoutDashboard, Settings2, Tags } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const links: Array<{ href: Route; label: string; icon: typeof LayoutDashboard }> = [
@@ -9,6 +9,7 @@ const links: Array<{ href: Route; label: string; icon: typeof LayoutDashboard }>
   { href: "/transactions", label: "Movimientos", icon: CircleDollarSign },
   { href: "/categories", label: "Categorias", icon: Tags },
   { href: "/budgets", label: "Presupuestos", icon: BadgeDollarSign },
+  { href: "/installments", label: "Cuotas", icon: CreditCard },
   { href: "/reports", label: "Reportes", icon: ChartColumnBig },
   { href: "/settings", label: "Configuracion", icon: Settings2 }
 ];

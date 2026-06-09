@@ -5,14 +5,47 @@ export const authSchema = z.object({
   password: z.string().min(6, "La contrasena debe tener al menos 6 caracteres.")
 });
 
-export const transactionSchema = z.object({
+const transactionBaseSchema = z.object({
   id: z.string().optional(),
   title: z.string().min(2, "El titulo es demasiado corto.").max(100),
   amount: z.coerce.number().positive("El monto debe ser mayor a 0."),
   type: z.enum(["INCOME", "EXPENSE"]),
   categoryId: z.string().min(1, "La categoria es obligatoria."),
   date: z.coerce.date(),
-  notes: z.string().max(300).optional().or(z.literal(""))
+  notes: z.string().max(300).optional().or(z.literal("")),
+  isInstallment: z
+    .union([z.literal("on"), z.literal("true"), z.literal("false"), z.undefined()])
+    .transform((value) => value === "on" || value === "true"),
+  installmentCount: z.coerce.number().int().min(1).max(60).optional(),
+  firstDueDate: z.string().optional().or(z.literal(""))
+});
+
+export const transactionSchema = transactionBaseSchema.superRefine((data, ctx) => {
+  if (data.isInstallment) {
+    if (data.type !== "EXPENSE") {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Las cuotas solo se permiten para gastos.",
+        path: ["isInstallment"]
+      });
+    }
+
+    if (!data.installmentCount || data.installmentCount < 2) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "La compra en cuotas debe tener al menos 2 cuotas.",
+        path: ["installmentCount"]
+      });
+    }
+
+    if (!data.firstDueDate) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Debes indicar el primer vencimiento.",
+        path: ["firstDueDate"]
+      });
+    }
+  }
 });
 
 export const categorySchema = z.object({
@@ -36,7 +69,7 @@ const importCategorySchema = categorySchema.extend({
   updatedAt: z.string().optional()
 });
 
-const importTransactionSchema = transactionSchema.extend({
+const importTransactionSchema = transactionBaseSchema.extend({
   createdAt: z.string().optional(),
   updatedAt: z.string().optional()
 });
