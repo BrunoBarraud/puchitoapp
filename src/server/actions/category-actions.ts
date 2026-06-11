@@ -56,7 +56,7 @@ export async function saveCategoryAction(_: ActionState, formData: FormData): Pr
     revalidatePath("/budgets");
     revalidatePath("/reports");
 
-    return { success: true, message: parsed.data.id ? "Categoria actualizada." : "Categoria creada." };
+    return { success: true, message: parsed.data.id ? "Categoría actualizada." : "Categoría creada." };
   } catch (error) {
     return { success: false, message: "No se pudo guardar la categoría." };
   }
@@ -91,7 +91,7 @@ export async function deleteCategoryAction(id: string): Promise<ActionState> {
     revalidatePath("/budgets");
     revalidatePath("/reports");
 
-    return { success: true, message: "Categoria eliminada." };
+    return { success: true, message: "Categoría eliminada." };
   } catch (error) {
     return { success: false, message: "No se pudo eliminar la categoría." };
   }

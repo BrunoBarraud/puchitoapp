@@ -163,7 +163,7 @@ export async function importDataAction(_: ActionState, formData: FormData): Prom
     const file = formData.get("file");
 
     if (!(file instanceof File)) {
-      return { success: false, message: "Subi un archivo JSON." };
+      return { success: false, message: "Subí un archivo JSON." };
     }
 
     const raw = await file.text();

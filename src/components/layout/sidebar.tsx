@@ -8,11 +8,11 @@ const links: Array<{ href: Route; label: string; icon: typeof LayoutDashboard }>
   { href: "/dashboard", label: "Resumen", icon: LayoutDashboard },
   { href: "/transactions", label: "Movimientos", icon: CircleDollarSign },
   { href: "/fixed-expenses", label: "Gastos fijos", icon: Repeat2 },
-  { href: "/categories", label: "Categorias", icon: Tags },
+  { href: "/categories", label: "Categorías", icon: Tags },
   { href: "/budgets", label: "Presupuestos", icon: BadgeDollarSign },
   { href: "/installments", label: "Cuotas", icon: CreditCard },
   { href: "/reports", label: "Reportes", icon: ChartColumnBig },
-  { href: "/settings", label: "Configuracion", icon: Settings2 }
+  { href: "/settings", label: "Configuración", icon: Settings2 }
 ];
 
 export function Sidebar({ pathname }: { pathname: string }) {
@@ -39,7 +39,7 @@ export function Sidebar({ pathname }: { pathname: string }) {
         ))}
       </nav>
       <div className="mt-auto rounded-3xl bg-white/10 p-4 text-sm text-stone-200">
-        <p className="font-semibold text-white">Los gastos chicos tambien pegan.</p>
+        <p className="font-semibold text-white">Los gastos chicos también pegan.</p>
         <p className="mt-1 text-xs leading-relaxed">Registralos antes de que se te vaya el mes en boludeces.</p>
       </div>
     </aside>

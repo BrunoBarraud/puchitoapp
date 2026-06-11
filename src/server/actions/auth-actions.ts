@@ -24,7 +24,7 @@ export async function registerAction(_: ActionState, formData: FormData): Promis
     });
 
     if (existingUser) {
-      return { success: false, message: "Este email ya esta registrado." };
+      return { success: false, message: "Este email ya está registrado." };
     }
 
     const passwordHash = await bcrypt.hash(parsed.data.password, 10);

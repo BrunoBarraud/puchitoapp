@@ -1,6 +1,6 @@
 # Puchito App
 
-Aplicacion fullstack de finanzas personales construida con Next.js, TypeScript, Tailwind CSS, Prisma y PostgreSQL.
+Aplicación fullstack de finanzas personales construida con Next.js, TypeScript, Tailwind CSS, Prisma y PostgreSQL.
 
 ## Stack
 
@@ -23,7 +23,7 @@ DATABASE_URL="postgresql://USER:PASSWORD@HOST:5432/puchito_app?schema=public"
 AUTH_SECRET="replace-with-a-long-random-secret"
 ```
 
-## Instalacion
+## Instalación
 
 ```bash
 npm install
@@ -48,7 +48,7 @@ npm run dev
 - Dashboard mensual con métricas, resumen y últimos movimientos
 - CRUD de transacciones, categorías y presupuestos
 - Reportes con Recharts
-- Importacion y exportacion JSON por usuario
+- Importación y exportación JSON por usuario
 - Rutas protegidas para usuarios autenticados
 
 ## Base de datos
@@ -67,5 +67,5 @@ npm run dev
 ## Notas
 
 - Las categorías por defecto se crean automáticamente al registrarse un usuario.
-- La importacion reasigna siempre `userId` al usuario autenticado.
+- La importación reasigna siempre `userId` al usuario autenticado.
 - Los datos principales viven en PostgreSQL, no en `localStorage`.

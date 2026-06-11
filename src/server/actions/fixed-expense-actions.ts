@@ -3,10 +3,10 @@
 import { revalidatePath } from "next/cache";
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { fixedExpenseSchema } from "@/lib/validations";
+import { fixedExpensePaymentSchema, fixedExpenseSchema } from "@/lib/validations";
 import type { ActionState } from "@/types";
 
-function normalizeNotes(notes?: string) {
+function normalizeNotes(notes?: string | null) {
   return notes?.trim() ? notes.trim() : null;
 }
 
@@ -19,16 +19,16 @@ export async function saveFixedExpenseAction(_: ActionState, formData: FormData)
       amount: formData.get("amount"),
       categoryId: formData.get("categoryId"),
       dayOfMonth: formData.get("dayOfMonth"),
-      startMonth: formData.get("startMonth"),
-      startYear: formData.get("startYear"),
-      endMonth: formData.get("endMonth"),
-      endYear: formData.get("endYear"),
+      startMonth: formData.get("startMonth") ?? new Date().getMonth() + 1,
+      startYear: formData.get("startYear") ?? new Date().getFullYear(),
+      endMonth: undefined,
+      endYear: undefined,
       active: formData.get("active"),
       notes: formData.get("notes")
     });
 
     if (!parsed.success) {
-      return { success: false, message: parsed.error.issues[0]?.message ?? "Gasto fijo invalido." };
+      return { success: false, message: parsed.error.issues[0]?.message ?? "Gasto fijo inválido." };
     }
 
     const category = await prisma.category.findFirst({
@@ -40,7 +40,7 @@ export async function saveFixedExpenseAction(_: ActionState, formData: FormData)
     });
 
     if (!category) {
-      return { success: false, message: "La categoria no existe para este usuario." };
+      return { success: false, message: "La categoría no existe para este usuario." };
     }
 
     const data = {
@@ -50,8 +50,8 @@ export async function saveFixedExpenseAction(_: ActionState, formData: FormData)
       dayOfMonth: parsed.data.dayOfMonth,
       startMonth: parsed.data.startMonth,
       startYear: parsed.data.startYear,
-      endMonth: parsed.data.endMonth ?? null,
-      endYear: parsed.data.endYear ?? null,
+      endMonth: null,
+      endYear: null,
       active: parsed.data.active,
       notes: normalizeNotes(parsed.data.notes)
     };
@@ -62,7 +62,7 @@ export async function saveFixedExpenseAction(_: ActionState, formData: FormData)
       });
 
       if (!existing) {
-        return { success: false, message: "No se encontro el gasto fijo." };
+        return { success: false, message: "No se encontró el gasto fijo." };
       }
 
       await prisma.fixedExpense.update({
@@ -90,6 +90,90 @@ export async function saveFixedExpenseAction(_: ActionState, formData: FormData)
   }
 }
 
+export async function payFixedExpenseAction(_: ActionState, formData: FormData): Promise<ActionState> {
+  try {
+    const user = await requireUser();
+    const parsed = fixedExpensePaymentSchema.safeParse({
+      fixedExpenseId: formData.get("fixedExpenseId"),
+      month: formData.get("month"),
+      year: formData.get("year"),
+      amount: formData.get("amount")
+    });
+
+    if (!parsed.success) {
+      return { success: false, message: parsed.error.issues[0]?.message ?? "Pago inválido." };
+    }
+
+    const fixedExpense = await prisma.fixedExpense.findFirst({
+      where: {
+        id: parsed.data.fixedExpenseId,
+        userId: user.id,
+        active: true
+      }
+    });
+
+    if (!fixedExpense) {
+      return { success: false, message: "No se encontró el gasto fijo." };
+    }
+
+    const existingPayment = await prisma.fixedExpensePayment.findUnique({
+      where: {
+        fixedExpenseId_month_year: {
+          fixedExpenseId: fixedExpense.id,
+          month: parsed.data.month,
+          year: parsed.data.year
+        }
+      }
+    });
+
+    if (existingPayment) {
+      return { success: false, message: "Este gasto fijo ya está marcado como pagado este mes." };
+    }
+
+    await prisma.$transaction(async (tx) => {
+      const transaction = await tx.transaction.create({
+        data: {
+          title: fixedExpense.title,
+          amount: parsed.data.amount,
+          type: "EXPENSE",
+          categoryId: fixedExpense.categoryId,
+          date: new Date(parsed.data.year, parsed.data.month - 1, Math.min(fixedExpense.dayOfMonth, 28)),
+          notes: normalizeNotes(fixedExpense.notes),
+          userId: user.id
+        }
+      });
+
+      await tx.fixedExpensePayment.create({
+        data: {
+          fixedExpenseId: fixedExpense.id,
+          month: parsed.data.month,
+          year: parsed.data.year,
+          amount: parsed.data.amount,
+          transactionId: transaction.id,
+          userId: user.id
+        }
+      });
+
+      await tx.fixedExpense.update({
+        where: { id: fixedExpense.id },
+        data: {
+          amount: parsed.data.amount
+        }
+      });
+    });
+
+    revalidatePath("/dashboard");
+    revalidatePath("/fixed-expenses");
+    revalidatePath("/budgets");
+    revalidatePath("/reports");
+    revalidatePath("/transactions");
+
+    return { success: true, message: "Gasto fijo pagado y registrado como movimiento." };
+  } catch (error) {
+    return { success: false, message: "No se pudo registrar el pago del gasto fijo." };
+  }
+}
+
 export async function deleteFixedExpenseAction(id: string): Promise<ActionState> {
   try {
     const user = await requireUser();
@@ -98,7 +182,7 @@ export async function deleteFixedExpenseAction(id: string): Promise<ActionState>
     });
 
     if (!existing) {
-      return { success: false, message: "No se encontro el gasto fijo." };
+      return { success: false, message: "No se encontró el gasto fijo." };
     }
 
     await prisma.fixedExpense.delete({ where: { id } });

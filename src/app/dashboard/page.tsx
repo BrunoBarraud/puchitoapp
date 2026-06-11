@@ -27,9 +27,9 @@ export default async function DashboardPage({
       {data.newYearSummary ? (
         <Card className="border-emerald-200 bg-emerald-50">
           <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-emerald-700">Cierre anual</p>
-          <h2 className="mt-1 text-2xl font-black tracking-tight text-stone-900">Feliz anio nuevo</h2>
+          <h2 className="mt-1 text-2xl font-black tracking-tight text-stone-900">Feliz año nuevo</h2>
           <p className="mt-2 text-sm text-stone-700">
-            Se guardo el resumen de {data.newYearSummary.year}: ingresos {formatCurrency(Number(data.newYearSummary.incomeTotal))}, gastos{" "}
+            Se guardó el resumen de {data.newYearSummary.year}: ingresos {formatCurrency(Number(data.newYearSummary.incomeTotal))}, gastos{" "}
             {formatCurrency(Number(data.newYearSummary.expenseTotal))} y balance {formatCurrency(Number(data.newYearSummary.balance))}.
           </p>
         </Card>
@@ -148,16 +148,16 @@ export default async function DashboardPage({
             <div className="mt-5 space-y-3">
               {data.fixedExpenses.length === 0 ? (
                 <div className="rounded-[1.5rem] bg-[#fff5e7] px-4 py-5 text-sm text-stone-600">
-                  No hay gastos fijos activos este mes.
+                  No hay gastos fijos pagados este mes.
                 </div>
               ) : (
                 data.fixedExpenses.map((item: FixedExpense) => (
                   <div key={item.id} className="rounded-[1.5rem] bg-white px-4 py-4 shadow-[0_12px_28px_-24px_rgba(58,38,18,0.35)]">
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0">
-                        <p className="truncate font-semibold text-stone-900">{item.title}</p>
+                        <p className="truncate font-semibold text-stone-900">{item.fixedExpense.title}</p>
                         <p className="mt-1 text-sm text-stone-500">
-                          {item.category.name} - dia {item.dayOfMonth}
+                          {item.fixedExpense.category.name} - pagado
                         </p>
                       </div>
                       <span className="shrink-0 text-base font-black text-rose-600">{formatCurrency(Number(item.amount))}</span>

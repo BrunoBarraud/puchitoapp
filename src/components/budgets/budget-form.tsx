@@ -17,7 +17,7 @@ export function BudgetForm({ budget, categories, month, year }: { budget?: Budge
           <Field label="Monto">
             <Input name="amount" type="number" step="0.01" defaultValue={Number(budget?.amount ?? 0) || ""} required />
           </Field>
-          <Field label="Categoria">
+          <Field label="Categoría">
             <Select name="categoryId" defaultValue={budget?.categoryId ?? categories[0]?.id}>
               {categories.map((category) => (
                 <option key={category.id} value={category.id}>
@@ -29,7 +29,7 @@ export function BudgetForm({ budget, categories, month, year }: { budget?: Budge
           <Field label="Mes">
             <Input name="month" type="number" min="1" max="12" defaultValue={budget?.month ?? month} required />
           </Field>
-          <Field label="Anio">
+          <Field label="Año">
             <Input name="year" type="number" min="2000" max="2100" defaultValue={budget?.year ?? year} required />
           </Field>
         </div>

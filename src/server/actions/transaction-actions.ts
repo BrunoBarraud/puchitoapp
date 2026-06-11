@@ -42,7 +42,7 @@ export async function saveTransactionAction(_: ActionState, formData: FormData):
     });
 
     if (!parsed.success) {
-      return { success: false, message: parsed.error.issues[0]?.message ?? "Movimiento invalido." };
+      return { success: false, message: parsed.error.issues[0]?.message ?? "Movimiento inválido." };
     }
 
     const category = await prisma.category.findFirst({
@@ -64,7 +64,7 @@ export async function saveTransactionAction(_: ActionState, formData: FormData):
       });
 
       if (!existing) {
-        return { success: false, message: "No se encontro el movimiento." };
+        return { success: false, message: "No se encontró el movimiento." };
       }
 
       if (existing.installmentPlan) {
@@ -158,7 +158,7 @@ export async function deleteTransactionAction(id: string): Promise<ActionState> 
     });
 
     if (!existing) {
-      return { success: false, message: "No se encontro el movimiento." };
+      return { success: false, message: "No se encontró el movimiento." };
     }
 
     await prisma.transaction.delete({ where: { id } });
@@ -182,7 +182,7 @@ export async function toggleInstallmentPaymentAction(id: string): Promise<Action
     });
 
     if (!payment) {
-      return { success: false, message: "No se encontro la cuota." };
+      return { success: false, message: "No se encontró la cuota." };
     }
 
     const nextStatus = payment.status === InstallmentStatus.PAID ? getInstallmentStatus(payment.dueDate) : InstallmentStatus.PAID;

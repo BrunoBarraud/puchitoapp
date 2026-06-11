@@ -42,7 +42,7 @@ export async function saveBudgetAction(_: ActionState, formData: FormData): Prom
       });
 
       if (!existing) {
-        return { success: false, message: "No se encontro el presupuesto." };
+        return { success: false, message: "No se encontró el presupuesto." };
       }
 
       await prisma.budget.update({
@@ -75,7 +75,7 @@ export async function deleteBudgetAction(id: string): Promise<ActionState> {
     });
 
     if (!existing) {
-      return { success: false, message: "No se encontro el presupuesto." };
+      return { success: false, message: "No se encontró el presupuesto." };
     }
 
     await prisma.budget.delete({ where: { id } });

@@ -71,7 +71,7 @@ export default async function ReportsPage() {
                 </p>
               </div>
             ))}
-            {report.yearlySummaries.length === 0 ? <p className="text-sm text-stone-500">Todavia no hay cierres anuales archivados.</p> : null}
+            {report.yearlySummaries.length === 0 ? <p className="text-sm text-stone-500">Todavía no hay cierres anuales archivados.</p> : null}
           </div>
         </Card>
       </div>

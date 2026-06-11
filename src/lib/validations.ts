@@ -57,7 +57,7 @@ export const transactionSchema = transactionBaseSchema.superRefine((data, ctx) =
     if (!data.firstDueDate) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: "Debes indicar el primer vencimiento.",
+        message: "Debés indicar el primer vencimiento.",
         path: ["firstDueDate"]
       });
     }
@@ -102,9 +102,9 @@ const optionalYear = z.preprocess(
 
 const fixedExpenseBaseSchema = z.object({
   id: z.string().optional(),
-  title: z.string().min(2, "El titulo es demasiado corto.").max(100),
+  title: z.string().min(2, "El título es demasiado corto.").max(100),
   amount: z.coerce.number().positive("El monto debe ser mayor a 0."),
-  categoryId: z.string().min(1, "La categoria es obligatoria."),
+  categoryId: z.string().min(1, "La categoría es obligatoria."),
   dayOfMonth: z.coerce.number().int().min(1).max(31).default(1),
   startMonth: z.coerce.number().int().min(1).max(12),
   startYear: z.coerce.number().int().min(2000).max(2100),
@@ -116,6 +116,13 @@ const fixedExpenseBaseSchema = z.object({
   notes: z.string().max(300).optional().or(z.literal(""))
 });
 
+export const fixedExpensePaymentSchema = z.object({
+  fixedExpenseId: z.string().min(1),
+  month: z.coerce.number().int().min(1).max(12),
+  year: z.coerce.number().int().min(2000).max(2100),
+  amount: z.coerce.number().positive("El monto debe ser mayor a 0.")
+});
+
 export const fixedExpenseSchema = fixedExpenseBaseSchema.superRefine((data, ctx) => {
   const hasEndMonth = typeof data.endMonth === "number";
   const hasEndYear = typeof data.endYear === "number";
@@ -123,7 +130,7 @@ export const fixedExpenseSchema = fixedExpenseBaseSchema.superRefine((data, ctx)
   if (hasEndMonth !== hasEndYear) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
-      message: "Completa mes y anio de fin, o deja ambos vacios.",
+      message: "Completá mes y año de fin, o dejá ambos vacíos.",
       path: ["endMonth"]
     });
   }

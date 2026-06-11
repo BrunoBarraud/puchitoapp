@@ -5,19 +5,10 @@ import { formatCurrency } from "@/lib/formatters";
 import { parseMonthYear } from "@/lib/utils";
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { deleteFixedExpenseAction } from "@/server/actions/fixed-expense-actions";
+import { deleteFixedExpenseAction, payFixedExpenseAction } from "@/server/actions/fixed-expense-actions";
+import type { ActionState } from "@/types";
 
-function isActiveInMonth(item: { startMonth: number; startYear: number; endMonth: number | null; endYear: number | null; active: boolean }, month: number, year: number) {
-  if (!item.active) {
-    return false;
-  }
-
-  const current = year * 12 + month;
-  const start = item.startYear * 12 + item.startMonth;
-  const end = item.endYear && item.endMonth ? item.endYear * 12 + item.endMonth : Number.POSITIVE_INFINITY;
-
-  return current >= start && current <= end;
-}
+const emptyActionState: ActionState = { success: false, message: "" };
 
 export default async function FixedExpensesPage({
   searchParams
@@ -31,12 +22,17 @@ export default async function FixedExpensesPage({
   const fixedExpenseToEdit = params.editId ? await prisma.fixedExpense.findFirst({ where: { id: params.editId, userId: user.id } }) : null;
   const fixedExpenses = await prisma.fixedExpense.findMany({
     where: { userId: user.id },
-    include: { category: true },
+    include: {
+      category: true,
+      payments: {
+        where: { month, year },
+        include: { transaction: true }
+      }
+    },
     orderBy: [{ active: "desc" }, { title: "asc" }]
   });
   const monthlyTotal = fixedExpenses
-    .filter((item) => isActiveInMonth(item, month, year))
-    .reduce((total, item) => total + Number(item.amount), 0);
+    .reduce((total, item) => total + Number(item.payments[0]?.amount ?? 0), 0);
 
   async function deleteFixedExpense(formData: FormData) {
     "use server";
@@ -44,6 +40,11 @@ export default async function FixedExpensesPage({
     if (typeof id === "string") {
       await deleteFixedExpenseAction(id);
     }
+  }
+
+  async function payFixedExpense(formData: FormData) {
+    "use server";
+    await payFixedExpenseAction(emptyActionState, formData);
   }
 
   return (
@@ -65,7 +66,7 @@ export default async function FixedExpensesPage({
           </div>
           <div className="mt-5 space-y-4">
             {fixedExpenses.map((item) => {
-              const activeThisMonth = isActiveInMonth(item, month, year);
+              const payment = item.payments[0];
 
               return (
                 <div key={item.id} className="rounded-2xl border border-stone-200 p-4">
@@ -73,21 +74,27 @@ export default async function FixedExpensesPage({
                     <div className="min-w-0">
                       <p className="truncate font-semibold text-stone-900">{item.title}</p>
                       <p className="mt-1 text-sm text-stone-500">
-                        {item.category.name} - dia {item.dayOfMonth}
+                        {item.category.name} - día {item.dayOfMonth}
                       </p>
-                      <p className="mt-1 text-xs text-stone-400">
-                        Desde {item.startMonth}/{item.startYear}
-                        {item.endMonth && item.endYear ? ` hasta ${item.endMonth}/${item.endYear}` : ""}
-                      </p>
+                      <p className="mt-1 text-xs text-stone-400">{item.active ? "Activo" : "Cancelado"}</p>
                     </div>
                     <div className="shrink-0 text-right">
-                      <p className="font-black text-rose-600">{formatCurrency(Number(item.amount))}</p>
-                      <span className={`mt-2 inline-flex rounded-full px-3 py-1 text-xs font-semibold ${activeThisMonth ? "bg-emerald-100 text-emerald-700" : "bg-stone-100 text-stone-500"}`}>
-                        {activeThisMonth ? "Cuenta este mes" : "Fuera del mes"}
+                      <p className="font-black text-rose-600">{formatCurrency(Number(payment?.amount ?? item.amount))}</p>
+                      <span className={`mt-2 inline-flex rounded-full px-3 py-1 text-xs font-semibold ${payment ? "bg-emerald-100 text-emerald-700" : "bg-stone-100 text-stone-500"}`}>
+                        {payment ? "Pagado este mes" : "Pendiente"}
                       </span>
                     </div>
                   </div>
                   <div className="mt-4 flex flex-wrap gap-2">
+                    {!payment && item.active ? (
+                      <form action={payFixedExpense} className="flex flex-wrap gap-2">
+                        <input type="hidden" name="fixedExpenseId" value={item.id} />
+                        <input type="hidden" name="month" value={month} />
+                        <input type="hidden" name="year" value={year} />
+                        <input name="amount" type="number" step="0.01" defaultValue={Number(item.amount)} className="w-36 rounded-xl border px-3 py-1.5 text-xs font-semibold" />
+                        <button className="rounded-xl bg-emerald-100 px-3 py-1.5 text-xs font-semibold text-emerald-700">Marcar pagado</button>
+                      </form>
+                    ) : null}
                     <a href={`/fixed-expenses?editId=${item.id}&month=${month}&year=${year}`} className="rounded-xl border px-3 py-1.5 text-xs font-semibold">
                       Editar
                     </a>
@@ -99,7 +106,7 @@ export default async function FixedExpensesPage({
                 </div>
               );
             })}
-            {fixedExpenses.length === 0 ? <p className="text-sm text-stone-500">Todavia no hay gastos fijos cargados.</p> : null}
+            {fixedExpenses.length === 0 ? <p className="text-sm text-stone-500">Todavía no hay gastos fijos cargados.</p> : null}
           </div>
         </Card>
       </div>

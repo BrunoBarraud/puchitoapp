@@ -31,7 +31,7 @@ export function FixedExpenseForm({
           <Field label="Monto mensual">
             <Input name="amount" type="number" step="0.01" defaultValue={Number(fixedExpense?.amount ?? 0) || ""} required />
           </Field>
-          <Field label="Categoria">
+          <Field label="Categoría">
             <Select name="categoryId" defaultValue={fixedExpense?.categoryId ?? categories[0]?.id} required>
               {categories.map((category) => (
                 <option key={category.id} value={category.id}>
@@ -40,27 +40,17 @@ export function FixedExpenseForm({
               ))}
             </Select>
           </Field>
-          <Field label="Dia de cobro">
+          <Field label="Día de cobro">
             <Input name="dayOfMonth" type="number" min="1" max="31" defaultValue={fixedExpense?.dayOfMonth ?? 1} required />
           </Field>
-          <Field label="Mes de inicio">
-            <Input name="startMonth" type="number" min="1" max="12" defaultValue={fixedExpense?.startMonth ?? month} required />
-          </Field>
-          <Field label="Anio de inicio">
-            <Input name="startYear" type="number" min="2000" max="2100" defaultValue={fixedExpense?.startYear ?? year} required />
-          </Field>
-          <Field label="Mes de fin">
-            <Input name="endMonth" type="number" min="1" max="12" defaultValue={fixedExpense?.endMonth ?? ""} />
-          </Field>
-          <Field label="Anio de fin">
-            <Input name="endYear" type="number" min="2000" max="2100" defaultValue={fixedExpense?.endYear ?? ""} />
-          </Field>
         </div>
+        <input type="hidden" name="startMonth" value={fixedExpense?.startMonth ?? month} />
+        <input type="hidden" name="startYear" value={fixedExpense?.startYear ?? year} />
         <label className="flex items-start gap-3 rounded-2xl border border-stone-200 bg-stone-50 p-4">
           <input name="active" type="checkbox" defaultChecked={fixedExpense?.active ?? true} className="mt-1 h-4 w-4 rounded border-stone-300" />
           <span>
-            <span className="block font-semibold text-stone-900">Activo</span>
-            <span className="block text-sm text-stone-600">Si esta activo se descuenta automaticamente en cada mes dentro del rango.</span>
+            <span className="block font-semibold text-stone-900">Servicio activo</span>
+            <span className="block text-sm text-stone-600">Desmarcalo si lo cancelaste. Sólo cuenta como gasto cuando lo marcás como pagado.</span>
           </span>
         </label>
         <Field label="Notas">

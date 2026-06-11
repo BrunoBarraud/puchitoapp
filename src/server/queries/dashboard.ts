@@ -8,26 +8,6 @@ function getMonthRange(month: number, year: number) {
   return { start, end };
 }
 
-function monthValue(month: number, year: number) {
-  return year * 12 + month;
-}
-
-function isFixedExpenseActive(
-  item: { active: boolean; startMonth: number; startYear: number; endMonth: number | null; endYear: number | null },
-  month: number,
-  year: number
-) {
-  if (!item.active) {
-    return false;
-  }
-
-  const current = monthValue(month, year);
-  const start = monthValue(item.startMonth, item.startYear);
-  const end = item.endMonth && item.endYear ? monthValue(item.endMonth, item.endYear) : Number.POSITIVE_INFINITY;
-
-  return current >= start && current <= end;
-}
-
 function addCategoryExpense(
   map: Map<string, { categoryId: string; name: string; color: string; total: number }>,
   categoryId: string,
@@ -49,7 +29,7 @@ function addCategoryExpense(
 export async function getAnnualSummaryData(userId: string, year: number) {
   const start = new Date(year, 0, 1);
   const end = new Date(year + 1, 0, 1);
-  const [transactions, installmentPayments, fixedExpenses] = await Promise.all([
+  const [transactions, installmentPayments] = await Promise.all([
     prisma.transaction.findMany({
       where: {
         userId,
@@ -62,9 +42,6 @@ export async function getAnnualSummaryData(userId: string, year: number) {
         userId,
         dueDate: { gte: start, lt: end }
       }
-    }),
-    prisma.fixedExpense.findMany({
-      where: { userId, active: true }
     })
   ]);
 
@@ -92,14 +69,6 @@ export async function getAnnualSummaryData(userId: string, year: number) {
 
   for (const payment of installmentPayments) {
     months[payment.dueDate.getMonth()].installmentExpense += Number(payment.amount);
-  }
-
-  for (const fixedExpense of fixedExpenses) {
-    for (const entry of months) {
-      if (isFixedExpenseActive(fixedExpense, entry.monthNumber, year)) {
-        entry.fixedExpense += Number(fixedExpense.amount);
-      }
-    }
   }
 
   for (const entry of months) {
@@ -171,7 +140,7 @@ export async function getDashboardData(userId: string, month: number, year: numb
     }
   };
 
-  const [transactions, groupedCategories, installmentPayments, allTransactionTotals, dueInstallmentPayments, fixedExpenses, newYearSummary] = await Promise.all([
+  const [transactions, groupedCategories, installmentPayments, allTransactionTotals, dueInstallmentPayments, fixedExpensePayments, newYearSummary] = await Promise.all([
     prisma.transaction.findMany({
       where: {
         ...filter,
@@ -185,6 +154,11 @@ export async function getDashboardData(userId: string, month: number, year: numb
       },
       include: {
         category: true,
+        fixedExpensePayment: {
+          include: {
+            fixedExpense: true
+          }
+        },
         installmentPlan: {
           include: {
             payments: {
@@ -255,14 +229,19 @@ export async function getDashboardData(userId: string, month: number, year: numb
         amount: true
       }
     }),
-    prisma.fixedExpense.findMany({
-      where: { userId, active: true },
-      include: { category: true },
-      orderBy: { title: "asc" }
+    prisma.fixedExpensePayment.findMany({
+      where: { userId, month, year },
+      include: {
+        fixedExpense: {
+          include: {
+            category: true
+          }
+        }
+      },
+      orderBy: { paidAt: "desc" }
     }),
     ensurePreviousYearSummary(userId)
   ]);
-  const activeFixedExpenses = fixedExpenses.filter((item) => isFixedExpenseActive(item, month, year));
 
   const income = transactions
     .filter((transaction) => transaction.type === "INCOME")
@@ -274,7 +253,7 @@ export async function getDashboardData(userId: string, month: number, year: numb
   const totalExpense = Number(allTransactionTotals.find((item) => item.type === "EXPENSE")?._sum.amount ?? 0);
   const installmentExpense = installmentPayments.reduce((total, payment) => total + Number(payment.amount), 0);
   const dueInstallmentExpense = dueInstallmentPayments.reduce((total, payment) => total + Number(payment.amount), 0);
-  const fixedExpense = activeFixedExpenses.reduce((total, item) => total + Number(item.amount), 0);
+  const fixedExpense = fixedExpensePayments.reduce((total, item) => total + Number(item.amount), 0);
   const categories = await prisma.category.findMany({
     where: {
       id: {
@@ -288,20 +267,16 @@ export async function getDashboardData(userId: string, month: number, year: numb
   for (const item of groupedCategories) {
     const category = categories.find((entry) => entry.id === item.categoryId);
 
-    addCategoryExpense(expenseByCategoryMap, item.categoryId, category?.name ?? "Unknown", category?.color ?? "#78716c", Number(item._sum.amount ?? 0));
+    addCategoryExpense(expenseByCategoryMap, item.categoryId, category?.name ?? "Sin categoría", category?.color ?? "#78716c", Number(item._sum.amount ?? 0));
   }
 
   for (const payment of installmentPayments) {
     addCategoryExpense(expenseByCategoryMap, payment.plan.categoryId, payment.plan.category.name, payment.plan.category.color, Number(payment.amount));
   }
 
-  for (const item of activeFixedExpenses) {
-    addCategoryExpense(expenseByCategoryMap, item.categoryId, item.category.name, item.category.color, Number(item.amount));
-  }
-
   const monthlyMovements = transactions.map((transaction) => ({
     ...transaction,
-    installmentLabel: null as string | null
+    installmentLabel: transaction.fixedExpensePayment ? "Gasto fijo" : null as string | null
   }));
   const installmentMovements = installmentPayments.map((payment) => ({
     id: payment.id,
@@ -312,31 +287,22 @@ export async function getDashboardData(userId: string, month: number, year: numb
     category: payment.plan.category,
     installmentLabel: `${payment.installmentNumber}/${payment.plan.installmentCount} cuotas`
   }));
-  const fixedMovements = activeFixedExpenses.map((item) => ({
-    id: item.id,
-    title: `${item.title} - gasto fijo`,
-    amount: item.amount,
-    type: "EXPENSE" as const,
-    date: new Date(year, month - 1, Math.min(item.dayOfMonth, 28)),
-    category: item.category,
-    installmentLabel: "Gasto fijo"
-  }));
-  const latestTransactions = [...monthlyMovements, ...installmentMovements, ...fixedMovements]
+  const latestTransactions = [...monthlyMovements, ...installmentMovements]
     .sort((a, b) => b.date.getTime() - a.date.getTime())
     .slice(0, 5);
-  const totalMonthlyExpense = expense + installmentExpense + fixedExpense;
+  const totalMonthlyExpense = expense + installmentExpense;
 
   return {
-    totalBalance: totalIncome - totalExpense - dueInstallmentExpense - fixedExpense,
+    totalBalance: totalIncome - totalExpense - dueInstallmentExpense,
     balance: income - totalMonthlyExpense,
     income,
     expense: totalMonthlyExpense,
     fixedExpense,
-    totalTransactions: transactions.length + installmentPayments.length + activeFixedExpenses.length,
+    totalTransactions: transactions.length + installmentPayments.length,
     latestTransactions,
     expenseByCategory: Array.from(expenseByCategoryMap.values()).sort((a, b) => b.total - a.total),
     upcomingInstallments: installmentPayments.slice(0, 5),
-    fixedExpenses: activeFixedExpenses.slice(0, 5),
+    fixedExpenses: fixedExpensePayments.slice(0, 5),
     newYearSummary
   };
 }
@@ -344,7 +310,7 @@ export async function getDashboardData(userId: string, month: number, year: numb
 export async function getReportData(userId: string) {
   const now = new Date();
   const annualSummary = await getAnnualSummaryData(userId, now.getFullYear());
-  const [transactions, installmentPayments, fixedExpenses, yearlySummaries] = await Promise.all([
+  const [transactions, installmentPayments, yearlySummaries] = await Promise.all([
     prisma.transaction.findMany({
       where: {
         userId,
@@ -363,10 +329,6 @@ export async function getReportData(userId: string) {
         }
       }
     }),
-    prisma.fixedExpense.findMany({
-      where: { userId, active: true },
-      include: { category: true }
-    }),
     prisma.yearlySummary.findMany({
       where: { userId },
       orderBy: { year: "desc" }
@@ -379,7 +341,7 @@ export async function getReportData(userId: string) {
   for (const transaction of transactions) {
     const key = `${transaction.date.getFullYear()}-${transaction.date.getMonth() + 1}`;
     const existingMonth = monthlyMap.get(key) ?? {
-      month: new Intl.DateTimeFormat("en-US", { month: "short", year: "numeric" }).format(transaction.date),
+      month: new Intl.DateTimeFormat("es-AR", { month: "short", year: "numeric" }).format(transaction.date),
       income: 0,
       expense: 0,
       balance: 0
@@ -434,47 +396,6 @@ export async function getReportData(userId: string) {
   for (const payment of installmentPayments) {
     years.add(payment.dueDate.getFullYear());
   }
-  for (const fixedExpense of fixedExpenses) {
-    const currentYear = now.getFullYear();
-    const endYear = fixedExpense.endYear ?? currentYear;
-    for (let activeYear = fixedExpense.startYear; activeYear <= endYear; activeYear += 1) {
-      years.add(activeYear);
-    }
-  }
-
-  for (const year of years) {
-    for (let activeMonth = 1; activeMonth <= 12; activeMonth += 1) {
-      const activeFixedExpenses = fixedExpenses.filter((item) => isFixedExpenseActive(item, activeMonth, year));
-      if (activeFixedExpenses.length === 0) {
-        continue;
-      }
-
-      const date = new Date(year, activeMonth - 1, 1);
-      const key = `${year}-${activeMonth}`;
-      const existingMonth = monthlyMap.get(key) ?? {
-        month: new Intl.DateTimeFormat("es-AR", { month: "short", year: "numeric" }).format(date),
-        income: 0,
-        expense: 0,
-        balance: 0
-      };
-
-      for (const item of activeFixedExpenses) {
-        const amount = Number(item.amount);
-        existingMonth.expense += amount;
-        const categoryEntry = categoryMap.get(item.categoryId) ?? {
-          name: item.category.name,
-          total: 0,
-          color: item.category.color ?? "#78716c"
-        };
-        categoryEntry.total += amount;
-        categoryMap.set(item.categoryId, categoryEntry);
-      }
-
-      existingMonth.balance = existingMonth.income - existingMonth.expense;
-      monthlyMap.set(key, existingMonth);
-    }
-  }
-
   const categoryTotals = Array.from(categoryMap.values()).sort((a, b) => b.total - a.total);
 
   return {
