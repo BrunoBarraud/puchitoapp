@@ -21,7 +21,10 @@ Crear `.env` a partir de `.env.example`:
 ```env
 DATABASE_URL="postgresql://USER:PASSWORD@HOST:5432/puchito_app?schema=public"
 AUTH_SECRET="replace-with-a-long-random-secret"
+NEXT_PUBLIC_MERCADO_PAGO_DONATION_URL=""
 ```
+
+`NEXT_PUBLIC_MERCADO_PAGO_DONATION_URL` es opcional. Si se completa con un link de Mercado Pago, el dashboard muestra un cartelito para colaborar con el proyecto.
 
 ## Instalación
 
@@ -60,7 +63,7 @@ npm run dev
 ## Deploy en Vercel
 
 1. Crear proyecto en Vercel y conectar el repositorio.
-2. Configurar `DATABASE_URL` y `AUTH_SECRET` en variables de entorno.
+2. Configurar `DATABASE_URL`, `AUTH_SECRET` y opcionalmente `NEXT_PUBLIC_MERCADO_PAGO_DONATION_URL` en variables de entorno.
 3. Usar una base PostgreSQL accesible desde Vercel.
 4. Ejecutar migraciones sobre la base productiva antes del primer uso.
 

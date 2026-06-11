@@ -24,6 +24,7 @@ export default async function DashboardPage({
   const data = await getDashboardData(user.id, month, year);
   const mainBalanceLabel = showAccumulatedBalance ? `Acumulado hasta ${getMonthLabel(month, year)}` : "Total disponible";
   const mainBalanceValue = showAccumulatedBalance ? data.accumulatedBalance : data.totalBalance;
+  const donationUrl = process.env.NEXT_PUBLIC_MERCADO_PAGO_DONATION_URL;
 
   return (
     <AppShell pathname="/dashboard" email={user.email} title="Resumen">
@@ -35,6 +36,31 @@ export default async function DashboardPage({
             Se guardó el resumen de {data.newYearSummary.year}: ingresos {formatCurrency(Number(data.newYearSummary.incomeTotal))}, gastos{" "}
             {formatCurrency(Number(data.newYearSummary.expenseTotal))} y balance {formatCurrency(Number(data.newYearSummary.balance))}.
           </p>
+        </Card>
+      ) : null}
+
+      {donationUrl ? (
+        <Card className="overflow-hidden border-[#bfe9ff] bg-gradient-to-br from-[#effbff] via-[#fffaf2] to-[#fff2c7]">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-start gap-3">
+              <div className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-[#00a8e8] text-sm font-black text-white shadow-[0_14px_28px_-18px_rgba(0,120,180,0.8)]">
+                MP
+              </div>
+              <div>
+                <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-sky-700">Colaborá con Puchito</p>
+                <h2 className="mt-1 text-xl font-black tracking-tight text-stone-900">Si la app te salva unos mangos, convidale un puchito al proyecto.</h2>
+                <p className="mt-1 text-sm text-stone-600">Podés mandar una colaboración voluntaria por Mercado Pago. Cero obligación, puro mimo cafetero.</p>
+              </div>
+            </div>
+            <a
+              href={donationUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex shrink-0 items-center justify-center rounded-2xl bg-stone-900 px-5 py-3 text-sm font-black text-brand-100 shadow-[0_18px_36px_-22px_rgba(28,22,18,0.9)] transition hover:-translate-y-0.5"
+            >
+              Colaborar
+            </a>
+          </div>
         </Card>
       ) : null}
 
