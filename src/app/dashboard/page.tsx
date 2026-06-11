@@ -64,8 +64,8 @@ export default async function DashboardPage({
         </Card>
       ) : null}
 
-      <section className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-6">
-        <MetricCard className="col-span-2 xl:col-span-1" label={mainBalanceLabel} value={formatCurrencyCompact(mainBalanceValue)} accent="#7d5928" />
+      <section className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3 2xl:grid-cols-6">
+        <MetricCard className="col-span-2 lg:col-span-1" label={mainBalanceLabel} value={formatCurrencyCompact(mainBalanceValue)} accent="#7d5928" />
         <MetricCard label="Balance del mes" value={formatCurrencyCompact(data.balance)} accent="#a16207" />
         <MetricCard label="Ingresos" value={formatCurrencyCompact(data.income)} accent="#16a34a" />
         <MetricCard label="Gastos" value={formatCurrencyCompact(data.expense)} accent="#dc2626" />
