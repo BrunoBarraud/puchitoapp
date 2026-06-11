@@ -1,5 +1,6 @@
 "use server";
 
+import { Prisma } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
@@ -112,17 +113,21 @@ function csvEscape(value: unknown) {
 
 export async function exportDataAction() {
   const user = await requireUser();
-  const [categories, transactions, budgets] = await Promise.all([
+  const [categories, transactions, budgets, fixedExpenses, yearlySummaries] = await Promise.all([
     prisma.category.findMany({ where: { userId: user.id }, orderBy: { createdAt: "asc" } }),
     prisma.transaction.findMany({ where: { userId: user.id }, orderBy: { date: "desc" } }),
-    prisma.budget.findMany({ where: { userId: user.id }, orderBy: [{ year: "desc" }, { month: "desc" }] })
+    prisma.budget.findMany({ where: { userId: user.id }, orderBy: [{ year: "desc" }, { month: "desc" }] }),
+    prisma.fixedExpense.findMany({ where: { userId: user.id }, orderBy: { title: "asc" } }),
+    prisma.yearlySummary.findMany({ where: { userId: user.id }, orderBy: { year: "desc" } })
   ]);
 
   return JSON.stringify(
     {
       categories,
       transactions,
-      budgets
+      budgets,
+      fixedExpenses,
+      yearlySummaries
     },
     null,
     2
@@ -241,12 +246,65 @@ export async function importDataAction(_: ActionState, formData: FormData): Prom
           }
         });
       }
+
+      for (const fixedExpense of parsed.data.fixedExpenses) {
+        const categoryId = categoryIdMap.get(fixedExpense.categoryId) ?? fixedExpense.categoryId;
+        const ownsCategory = await tx.category.findFirst({
+          where: { id: categoryId, userId: user.id, type: "EXPENSE" }
+        });
+
+        if (!ownsCategory) {
+          continue;
+        }
+
+        await tx.fixedExpense.create({
+          data: {
+            title: fixedExpense.title,
+            amount: fixedExpense.amount,
+            categoryId,
+            dayOfMonth: fixedExpense.dayOfMonth,
+            startMonth: fixedExpense.startMonth,
+            startYear: fixedExpense.startYear,
+            endMonth: fixedExpense.endMonth ?? null,
+            endYear: fixedExpense.endYear ?? null,
+            active: fixedExpense.active,
+            notes: fixedExpense.notes || null,
+            userId: user.id
+          }
+        });
+      }
+
+      for (const summary of parsed.data.yearlySummaries) {
+        await tx.yearlySummary.upsert({
+          where: {
+            userId_year: {
+              userId: user.id,
+              year: summary.year
+            }
+          },
+          create: {
+            userId: user.id,
+            year: summary.year,
+            incomeTotal: summary.incomeTotal,
+            expenseTotal: summary.expenseTotal,
+            balance: summary.balance,
+            monthlyBreakdown: summary.monthlyBreakdown as Prisma.InputJsonValue
+          },
+          update: {
+            incomeTotal: summary.incomeTotal,
+            expenseTotal: summary.expenseTotal,
+            balance: summary.balance,
+            monthlyBreakdown: summary.monthlyBreakdown as Prisma.InputJsonValue
+          }
+        });
+      }
     });
 
     revalidatePath("/dashboard");
     revalidatePath("/transactions");
     revalidatePath("/categories");
     revalidatePath("/budgets");
+    revalidatePath("/fixed-expenses");
     revalidatePath("/reports");
     revalidatePath("/settings");
 

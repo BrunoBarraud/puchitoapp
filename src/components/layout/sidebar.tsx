@@ -1,12 +1,13 @@
 import Link from "next/link";
 import Image from "next/image";
 import type { Route } from "next";
-import { BadgeDollarSign, ChartColumnBig, CircleDollarSign, CreditCard, LayoutDashboard, Settings2, Tags } from "lucide-react";
+import { BadgeDollarSign, ChartColumnBig, CircleDollarSign, CreditCard, LayoutDashboard, Repeat2, Settings2, Tags } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const links: Array<{ href: Route; label: string; icon: typeof LayoutDashboard }> = [
   { href: "/dashboard", label: "Resumen", icon: LayoutDashboard },
   { href: "/transactions", label: "Movimientos", icon: CircleDollarSign },
+  { href: "/fixed-expenses", label: "Gastos fijos", icon: Repeat2 },
   { href: "/categories", label: "Categorias", icon: Tags },
   { href: "/budgets", label: "Presupuestos", icon: BadgeDollarSign },
   { href: "/installments", label: "Cuotas", icon: CreditCard },

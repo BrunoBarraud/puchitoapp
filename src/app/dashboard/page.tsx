@@ -10,6 +10,7 @@ type DashboardData = Awaited<ReturnType<typeof getDashboardData>>;
 type LatestTransaction = DashboardData["latestTransactions"][number];
 type UpcomingInstallment = DashboardData["upcomingInstallments"][number];
 type ExpenseByCategoryItem = DashboardData["expenseByCategory"][number];
+type FixedExpense = DashboardData["fixedExpenses"][number];
 
 export default async function DashboardPage({
   searchParams
@@ -23,11 +24,23 @@ export default async function DashboardPage({
 
   return (
     <AppShell pathname="/dashboard" email={user.email} title="Resumen">
-      <section className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-5">
+      {data.newYearSummary ? (
+        <Card className="border-emerald-200 bg-emerald-50">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-emerald-700">Cierre anual</p>
+          <h2 className="mt-1 text-2xl font-black tracking-tight text-stone-900">Feliz anio nuevo</h2>
+          <p className="mt-2 text-sm text-stone-700">
+            Se guardo el resumen de {data.newYearSummary.year}: ingresos {formatCurrency(Number(data.newYearSummary.incomeTotal))}, gastos{" "}
+            {formatCurrency(Number(data.newYearSummary.expenseTotal))} y balance {formatCurrency(Number(data.newYearSummary.balance))}.
+          </p>
+        </Card>
+      ) : null}
+
+      <section className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-6">
         <MetricCard className="col-span-2 xl:col-span-1" label="Total disponible" value={formatCurrencyCompact(data.totalBalance)} accent="#7d5928" />
         <MetricCard label="Balance del mes" value={formatCurrencyCompact(data.balance)} accent="#a16207" />
         <MetricCard label="Ingresos" value={formatCurrencyCompact(data.income)} accent="#16a34a" />
         <MetricCard label="Gastos" value={formatCurrencyCompact(data.expense)} accent="#dc2626" />
+        <MetricCard label="Gastos fijos" value={formatCurrencyCompact(data.fixedExpense)} accent="#be123c" />
         <MetricCard label="Movimientos" value={String(data.totalTransactions)} accent="#0284c7" />
       </section>
 
@@ -115,6 +128,39 @@ export default async function DashboardPage({
                     </div>
                     <div className="h-3 rounded-full bg-stone-100">
                       <div className="h-3 rounded-full" style={{ width: `${Math.min((item.total / Math.max(data.expense, 1)) * 100, 100)}%`, backgroundColor: item.color }} />
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </Card>
+
+          <Card>
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-brand-700">Recurrentes</p>
+                <h2 className="mt-1 text-2xl font-black tracking-tight text-stone-900">Gastos fijos</h2>
+              </div>
+              <a href="/fixed-expenses" className="text-sm font-semibold text-brand-700">
+                Ver todos
+              </a>
+            </div>
+            <div className="mt-5 space-y-3">
+              {data.fixedExpenses.length === 0 ? (
+                <div className="rounded-[1.5rem] bg-[#fff5e7] px-4 py-5 text-sm text-stone-600">
+                  No hay gastos fijos activos este mes.
+                </div>
+              ) : (
+                data.fixedExpenses.map((item: FixedExpense) => (
+                  <div key={item.id} className="rounded-[1.5rem] bg-white px-4 py-4 shadow-[0_12px_28px_-24px_rgba(58,38,18,0.35)]">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <p className="truncate font-semibold text-stone-900">{item.title}</p>
+                        <p className="mt-1 text-sm text-stone-500">
+                          {item.category.name} - dia {item.dayOfMonth}
+                        </p>
+                      </div>
+                      <span className="shrink-0 text-base font-black text-rose-600">{formatCurrency(Number(item.amount))}</span>
                     </div>
                   </div>
                 ))

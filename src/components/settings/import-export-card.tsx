@@ -34,7 +34,7 @@ export function ImportExportCard({ exportedJson }: { exportedJson: string }) {
     <div className="grid gap-6 xl:grid-cols-2">
       <Card>
         <h2 className="text-xl font-bold">Exportar tus datos</h2>
-        <p className="mt-2 text-sm text-stone-600">Descargá un backup completo en JSON o tus movimientos en CSV para Excel/Sheets.</p>
+        <p className="mt-2 text-sm text-stone-600">Descargá un backup completo en JSON, incluyendo gastos fijos y cierres anuales, o tus movimientos en CSV para Excel/Sheets.</p>
         <div className="mt-5 flex flex-col gap-3 sm:flex-row">
           <button type="button" onClick={handleJsonExport} className="rounded-2xl bg-brand-700 px-4 py-2.5 text-sm font-semibold text-white">
             Preparar JSON

@@ -32,6 +32,12 @@ export default async function BudgetsPage({
     },
     _sum: { amount: true }
   });
+  const fixedExpenses = await prisma.fixedExpense.findMany({
+    where: {
+      userId: user.id,
+      active: true
+    }
+  });
 
   async function deleteBudget(formData: FormData) {
     "use server";
@@ -56,7 +62,16 @@ export default async function BudgetsPage({
           </div>
           <div className="mt-5 space-y-4">
             {budgets.map((budget) => {
-              const spent = Number(expenses.find((entry) => entry.categoryId === budget.categoryId)?._sum.amount ?? 0);
+              const fixedSpent = fixedExpenses
+                .filter((item) => {
+                  const current = year * 12 + month;
+                  const start = item.startYear * 12 + item.startMonth;
+                  const end = item.endYear && item.endMonth ? item.endYear * 12 + item.endMonth : Number.POSITIVE_INFINITY;
+
+                  return item.categoryId === budget.categoryId && current >= start && current <= end;
+                })
+                .reduce((total, item) => total + Number(item.amount), 0);
+              const spent = Number(expenses.find((entry) => entry.categoryId === budget.categoryId)?._sum.amount ?? 0) + fixedSpent;
               const total = Number(budget.amount);
               const ratio = total > 0 ? (spent / total) * 100 : 0;
               const over = spent > total;

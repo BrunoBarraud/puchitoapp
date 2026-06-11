@@ -80,6 +80,68 @@ export const budgetSchema = z.object({
   categoryId: z.string().min(1)
 });
 
+const optionalMonth = z.preprocess(
+  (value) => {
+    if (value === "" || value === null || value === undefined) {
+      return undefined;
+    }
+    return value;
+  },
+  z.coerce.number().int().min(1).max(12).optional()
+);
+
+const optionalYear = z.preprocess(
+  (value) => {
+    if (value === "" || value === null || value === undefined) {
+      return undefined;
+    }
+    return value;
+  },
+  z.coerce.number().int().min(2000).max(2100).optional()
+);
+
+const fixedExpenseBaseSchema = z.object({
+  id: z.string().optional(),
+  title: z.string().min(2, "El titulo es demasiado corto.").max(100),
+  amount: z.coerce.number().positive("El monto debe ser mayor a 0."),
+  categoryId: z.string().min(1, "La categoria es obligatoria."),
+  dayOfMonth: z.coerce.number().int().min(1).max(31).default(1),
+  startMonth: z.coerce.number().int().min(1).max(12),
+  startYear: z.coerce.number().int().min(2000).max(2100),
+  endMonth: optionalMonth,
+  endYear: optionalYear,
+  active: z
+    .union([z.literal("on"), z.literal("true"), z.literal("false"), z.undefined()])
+    .transform((value) => value === "on" || value === "true"),
+  notes: z.string().max(300).optional().or(z.literal(""))
+});
+
+export const fixedExpenseSchema = fixedExpenseBaseSchema.superRefine((data, ctx) => {
+  const hasEndMonth = typeof data.endMonth === "number";
+  const hasEndYear = typeof data.endYear === "number";
+
+  if (hasEndMonth !== hasEndYear) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Completa mes y anio de fin, o deja ambos vacios.",
+      path: ["endMonth"]
+    });
+  }
+
+  if (hasEndMonth && hasEndYear) {
+    const startValue = data.startYear * 12 + data.startMonth;
+    const endValue = data.endYear! * 12 + data.endMonth!;
+
+    if (endValue < startValue) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "La fecha de fin no puede ser anterior al inicio.",
+        path: ["endMonth"]
+      });
+    }
+  }
+});
+
 const importCategorySchema = categorySchema.extend({
   createdAt: z.string().optional(),
   updatedAt: z.string().optional()
@@ -95,8 +157,23 @@ const importBudgetSchema = budgetSchema.extend({
   updatedAt: z.string().optional()
 });
 
+const importFixedExpenseSchema = fixedExpenseBaseSchema.extend({
+  createdAt: z.string().optional(),
+  updatedAt: z.string().optional()
+});
+
+const importYearlySummarySchema = z.object({
+  year: z.coerce.number().int().min(2000).max(2100),
+  incomeTotal: z.coerce.number(),
+  expenseTotal: z.coerce.number(),
+  balance: z.coerce.number(),
+  monthlyBreakdown: z.unknown()
+});
+
 export const importSchema = z.object({
   categories: z.array(importCategorySchema).default([]),
   transactions: z.array(importTransactionSchema).default([]),
-  budgets: z.array(importBudgetSchema).default([])
+  budgets: z.array(importBudgetSchema).default([]),
+  fixedExpenses: z.array(importFixedExpenseSchema).default([]),
+  yearlySummaries: z.array(importYearlySummarySchema).default([])
 });

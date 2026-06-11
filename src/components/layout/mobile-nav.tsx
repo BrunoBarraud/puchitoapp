@@ -3,7 +3,7 @@
 import Link from "next/link";
 import type { Route } from "next";
 import { usePathname } from "next/navigation";
-import { BadgeDollarSign, ChartColumnBig, CircleDollarSign, CreditCard, LayoutDashboard, Settings2, Tags } from "lucide-react";
+import { BadgeDollarSign, ChartColumnBig, CircleDollarSign, CreditCard, LayoutDashboard, Repeat2, Settings2, Tags } from "lucide-react";
 
 const links: Array<{
   href: Route;
@@ -13,6 +13,7 @@ const links: Array<{
 }> = [
   { href: "/dashboard", label: "Inicio", shortLabel: "Inicio", icon: LayoutDashboard },
   { href: "/transactions", label: "Movimientos", shortLabel: "Mov.", icon: CircleDollarSign },
+  { href: "/fixed-expenses", label: "Gastos fijos", shortLabel: "Fijos", icon: Repeat2 },
   { href: "/categories", label: "Categorías", shortLabel: "Cat.", icon: Tags },
   { href: "/budgets", label: "Presupuestos", shortLabel: "Pres.", icon: BadgeDollarSign },
   { href: "/installments", label: "Cuotas", shortLabel: "Cuotas", icon: CreditCard },
@@ -25,7 +26,7 @@ export function MobileNav() {
 
   return (
     <nav className="fixed inset-x-3 bottom-[calc(0.75rem+env(safe-area-inset-bottom))] z-50 rounded-[1.5rem] border border-[#eadfcb] bg-[#fffaf4]/95 p-1.5 shadow-[0_18px_35px_-24px_rgba(58,38,18,0.38)] backdrop-blur sm:inset-x-3 sm:rounded-[2rem] sm:p-2 lg:hidden">
-      <div className="grid grid-cols-7 gap-1">
+      <div className="grid grid-cols-4 gap-1 sm:grid-cols-8">
         {links.map(({ href, label, shortLabel, icon: Icon }) => {
           const active = pathname === href;
 
