@@ -9,7 +9,7 @@ function getMonthRange(month: number, year: number) {
 }
 
 function addCategoryExpense(
-  map: Map<string, { categoryId: string; name: string; color: string; total: number }>,
+  map: Map<string, { categoryId: string; name: string; color: string; total: number; accumulatedTotal: number }>,
   categoryId: string,
   name: string,
   color: string | null,
@@ -19,7 +19,8 @@ function addCategoryExpense(
     categoryId,
     name,
     color: color ?? "#78716c",
-    total: 0
+    total: 0,
+    accumulatedTotal: 0
   };
 
   current.total += amount;
@@ -140,7 +141,7 @@ export async function getDashboardData(userId: string, month: number, year: numb
     }
   };
 
-  const [transactions, groupedCategories, installmentPayments, allTransactionTotals, dueInstallmentPayments, fixedExpensePayments, newYearSummary] = await Promise.all([
+  const [transactions, groupedCategories, installmentPayments, allTransactionTotals, dueInstallmentPayments, accumulatedTransactionTotals, accumulatedInstallmentPayments, allExpenseCategories, allInstallmentPayments, fixedExpensePayments, newYearSummary] = await Promise.all([
     prisma.transaction.findMany({
       where: {
         ...filter,
@@ -229,6 +230,57 @@ export async function getDashboardData(userId: string, month: number, year: numb
         amount: true
       }
     }),
+    prisma.transaction.groupBy({
+      by: ["type"],
+      where: {
+        userId,
+        date: {
+          lt: end
+        },
+        OR: [
+          { type: "INCOME" },
+          {
+            type: "EXPENSE",
+            installmentPlan: null
+          }
+        ]
+      },
+      _sum: {
+        amount: true
+      }
+    }),
+    prisma.installmentPayment.findMany({
+      where: {
+        userId,
+        dueDate: {
+          lt: end
+        }
+      },
+      select: {
+        amount: true
+      }
+    }),
+    prisma.transaction.groupBy({
+      by: ["categoryId"],
+      where: {
+        userId,
+        type: "EXPENSE",
+        installmentPlan: null
+      },
+      _sum: {
+        amount: true
+      }
+    }),
+    prisma.installmentPayment.findMany({
+      where: { userId },
+      include: {
+        plan: {
+          select: {
+            categoryId: true
+          }
+        }
+      }
+    }),
     prisma.fixedExpensePayment.findMany({
       where: { userId, month, year },
       include: {
@@ -251,8 +303,11 @@ export async function getDashboardData(userId: string, month: number, year: numb
     .reduce((total, transaction) => total + Number(transaction.amount), 0);
   const totalIncome = Number(allTransactionTotals.find((item) => item.type === "INCOME")?._sum.amount ?? 0);
   const totalExpense = Number(allTransactionTotals.find((item) => item.type === "EXPENSE")?._sum.amount ?? 0);
+  const accumulatedIncome = Number(accumulatedTransactionTotals.find((item) => item.type === "INCOME")?._sum.amount ?? 0);
+  const accumulatedExpense = Number(accumulatedTransactionTotals.find((item) => item.type === "EXPENSE")?._sum.amount ?? 0);
   const installmentExpense = installmentPayments.reduce((total, payment) => total + Number(payment.amount), 0);
   const dueInstallmentExpense = dueInstallmentPayments.reduce((total, payment) => total + Number(payment.amount), 0);
+  const accumulatedInstallmentExpense = accumulatedInstallmentPayments.reduce((total, payment) => total + Number(payment.amount), 0);
   const fixedExpense = fixedExpensePayments.reduce((total, item) => total + Number(item.amount), 0);
   const categories = await prisma.category.findMany({
     where: {
@@ -262,7 +317,17 @@ export async function getDashboardData(userId: string, month: number, year: numb
     }
   });
 
-  const expenseByCategoryMap = new Map<string, { categoryId: string; name: string; color: string; total: number }>();
+  const accumulatedExpenseByCategory = new Map<string, number>();
+  const expenseByCategoryMap = new Map<string, { categoryId: string; name: string; color: string; total: number; accumulatedTotal: number }>();
+
+  for (const item of allExpenseCategories) {
+    accumulatedExpenseByCategory.set(item.categoryId, Number(item._sum.amount ?? 0));
+  }
+
+  for (const payment of allInstallmentPayments) {
+    const current = accumulatedExpenseByCategory.get(payment.plan.categoryId) ?? 0;
+    accumulatedExpenseByCategory.set(payment.plan.categoryId, current + Number(payment.amount));
+  }
 
   for (const item of groupedCategories) {
     const category = categories.find((entry) => entry.id === item.categoryId);
@@ -272,6 +337,10 @@ export async function getDashboardData(userId: string, month: number, year: numb
 
   for (const payment of installmentPayments) {
     addCategoryExpense(expenseByCategoryMap, payment.plan.categoryId, payment.plan.category.name, payment.plan.category.color, Number(payment.amount));
+  }
+
+  for (const item of expenseByCategoryMap.values()) {
+    item.accumulatedTotal = accumulatedExpenseByCategory.get(item.categoryId) ?? item.total;
   }
 
   const monthlyMovements = transactions.map((transaction) => ({
@@ -294,6 +363,7 @@ export async function getDashboardData(userId: string, month: number, year: numb
 
   return {
     totalBalance: totalIncome - totalExpense - dueInstallmentExpense,
+    accumulatedBalance: accumulatedIncome - accumulatedExpense - accumulatedInstallmentExpense,
     balance: income - totalMonthlyExpense,
     income,
     expense: totalMonthlyExpense,

@@ -15,12 +15,15 @@ type FixedExpense = DashboardData["fixedExpenses"][number];
 export default async function DashboardPage({
   searchParams
 }: {
-  searchParams: Promise<{ month?: string; year?: string }>;
+  searchParams: Promise<{ month?: string; year?: string; accumulated?: string }>;
 }) {
   const user = await requireUser();
   const params = await searchParams;
   const { month, year } = parseMonthYear(params);
+  const showAccumulatedBalance = params.accumulated === "on";
   const data = await getDashboardData(user.id, month, year);
+  const mainBalanceLabel = showAccumulatedBalance ? `Acumulado hasta ${getMonthLabel(month, year)}` : "Total disponible";
+  const mainBalanceValue = showAccumulatedBalance ? data.accumulatedBalance : data.totalBalance;
 
   return (
     <AppShell pathname="/dashboard" email={user.email} title="Resumen">
@@ -36,7 +39,7 @@ export default async function DashboardPage({
       ) : null}
 
       <section className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-6">
-        <MetricCard className="col-span-2 xl:col-span-1" label="Total disponible" value={formatCurrencyCompact(data.totalBalance)} accent="#7d5928" />
+        <MetricCard className="col-span-2 xl:col-span-1" label={mainBalanceLabel} value={formatCurrencyCompact(mainBalanceValue)} accent="#7d5928" />
         <MetricCard label="Balance del mes" value={formatCurrencyCompact(data.balance)} accent="#a16207" />
         <MetricCard label="Ingresos" value={formatCurrencyCompact(data.income)} accent="#16a34a" />
         <MetricCard label="Gastos" value={formatCurrencyCompact(data.expense)} accent="#dc2626" />
@@ -71,6 +74,17 @@ export default async function DashboardPage({
                   className="rounded-2xl border border-[#e6d7bd] bg-white px-3 py-2.5 text-sm shadow-inner"
                 />
                 <button className="rounded-2xl bg-stone-900 px-3 py-2.5 text-sm font-semibold text-brand-100">Ver</button>
+                <label className="col-span-3 flex items-start gap-2 rounded-2xl bg-[#fff5e7] px-3 py-3 text-sm text-stone-700">
+                  <input
+                    name="accumulated"
+                    type="checkbox"
+                    defaultChecked={showAccumulatedBalance}
+                    className="mt-0.5 size-4 rounded border-[#d9c7a8] text-brand-700"
+                  />
+                  <span>
+                    Ver saldo acumulado hasta este mes, sin usar el disponible actual.
+                  </span>
+                </label>
               </form>
             </div>
           </div>
@@ -128,6 +142,10 @@ export default async function DashboardPage({
                     </div>
                     <div className="h-3 rounded-full bg-stone-100">
                       <div className="h-3 rounded-full" style={{ width: `${Math.min((item.total / Math.max(data.expense, 1)) * 100, 100)}%`, backgroundColor: item.color }} />
+                    </div>
+                    <div className="mt-3 flex flex-wrap items-center justify-between gap-2 rounded-2xl bg-[#fff7eb] px-3 py-2 text-xs">
+                      <span className="font-semibold uppercase tracking-[0.18em] text-brand-700">Acumulado</span>
+                      <span className="font-black text-stone-900">{formatCurrency(item.accumulatedTotal)}</span>
                     </div>
                   </div>
                 ))
